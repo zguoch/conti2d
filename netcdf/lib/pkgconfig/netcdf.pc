@@ -1,0 +1,13 @@
+prefix=install
+exec_prefix=install
+libdir=install/lib
+includedir=install/include
+ccompiler=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc
+
+Name: netCDF
+Description: NetCDF Client Library for C
+URL: http://www.unidata.ucar.edu/netcdf
+Version: 4.7.0
+Libs: -L${libdir} -lnetcdf
+Libs.private: -lhdf5_hl -lhdf5 -lsz -lz -ldl -lm -lcurl
+Cflags: -I${includedir}
