@@ -659,7 +659,7 @@ int cContinuation::Getkernel_p2p_new(GrdHead grdhead, double rph, double** kerne
     double dy=(grdhead.bounds[3]-grdhead.bounds[2])/(grdhead.rows-1);
     int datanum=grdhead.rows*grdhead.cols;
     //omp parallel
-    // omp_set_num_threads(num_thread);
+     omp_set_num_threads(num_thread);
     // ProgressBar bar0(grdhead.rows);
     // MultiProgressBar multibar(grdhead.rows,COLOR_BAR_BLUE);
     #pragma omp parallel for shared(grdhead,dx,dy,kernel) 
@@ -679,9 +679,10 @@ int cContinuation::Getkernel_p2p_new(GrdHead grdhead, double rph, double** kerne
             //====================================================================
             delete[] vector_row_K;
         }
-        #pragma omp critical
+        //#pragma omp critical
         // multibar.Update();
-    }cout<<"\n";
+    }
+	cout<<"\n";
     return 0;
 }
 
@@ -779,7 +780,7 @@ void cContinuation::GetPmnij(double* Pmnij,int rows,int cols,double dx,double dy
  */
 void cContinuation::UWC_Gij(double* b,double** G,double* x, int modelnum,int num_thread)
 {
-    // omp_set_num_threads(num_thread);
+     omp_set_num_threads(num_thread);
     #pragma omp parallel for shared(b,x,modelnum)
     for (int i = 0; i < modelnum; i++)
     {
@@ -805,7 +806,7 @@ void cContinuation::UWC_Gij(double* b, double* G,double* x, GrdHead grdhead, int
 {
     int modelnum = grdhead.rows*grdhead.cols;
 
-    // omp_set_num_threads(num_thread);
+     omp_set_num_threads(num_thread);
     #pragma omp parallel for 				
     for (int i = 0; i < modelnum; i++)
     {

@@ -12,7 +12,7 @@
 #define CONTINUATION_H
 #include "stdfunc.h"
 #include "GModel.h"
-// #include "omp.h"
+ #include "omp.h"
 // =========triangle===========
 #ifdef SINGLE
 #define REAL float

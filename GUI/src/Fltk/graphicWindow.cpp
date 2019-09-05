@@ -3758,7 +3758,7 @@ static void file_open_grd(Fl_Widget * w, void *data)
       else {
 #endif
         _bar = new Fl_Menu_Bar(0, 0, width, BH);
-        // _bar->menu(bar_table);
+        _bar->menu(bar_table);
         _bar->global();
         fillRecentHistoryMenu();
 #if defined(__APPLE__)
