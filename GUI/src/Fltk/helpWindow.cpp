@@ -228,7 +228,7 @@ static void browser_cb(Fl_Widget *w, void *data)
           if(c1.size() && c2.size()) {
             editOption(type, c1, c2);
             int top = FlGui::instance()->help->browser->topline();
-            help_options_cb(0, 0);
+            // help_options_cb(0, 0);
             FlGui::instance()->help->browser->topline(top);
             FlGui::instance()->help->browser->select(i);
             drawContext::global()->draw();
@@ -265,9 +265,9 @@ void help_options_cb(Fl_Widget *w, void *data)
   std::transform(search.begin(), search.end(), search.begin(), ::tolower);
 
   PrintOptions(0, GMSH_FULLRC, diff, help, 0, &s0);
-#if defined(HAVE_PARSER)
-  PrintParserSymbols(help, s0);
-#endif
+  #if defined(HAVE_PARSER)
+    PrintParserSymbols(help, s0);
+  #endif
 
   int top = FlGui::instance()->help->browser->topline();
   FlGui::instance()->help->browser->clear();
@@ -287,7 +287,7 @@ void help_options_cb(Fl_Widget *w, void *data)
       FlGui::instance()->help->browser->add(s0[i].c_str(), d);
     }
     else {
-#if __cplusplus >= 201103L
+  #if __cplusplus >= 201103L
       try{
         // icase for case-insensitive search
         if(std::regex_search(s0[i], std::regex(search, std::regex_constants::icase)))
@@ -295,12 +295,12 @@ void help_options_cb(Fl_Widget *w, void *data)
       }
       catch(...) {
       }
-#else
+  #else
       std::string tmp(s0[i]);
       std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
       if(tmp.find(search) != std::string::npos)
         FlGui::instance()->help->browser->add(s0[i].c_str(), d);
-#endif
+  #endif
     }
   }
   FlGui::instance()->help->browser->topline(top);
@@ -439,12 +439,12 @@ helpWindow::helpWindow()
 
     modified = new Fl_Check_Button(WB, WB, BW, BH, "Only show modified");
     modified->type(FL_TOGGLE_BUTTON);
-    modified->callback(help_options_cb);
+    // modified->callback(help_options_cb);
     modified->tooltip("Show only values different from defaults");
 
     showhelp = new Fl_Check_Button(2 * WB + BW, WB, BW, BH, "Show help");
     showhelp->type(FL_TOGGLE_BUTTON);
-    showhelp->callback(help_options_cb);
+    // showhelp->callback(help_options_cb);
     showhelp->tooltip("Show help strings");
 
     Fl_Group *o = new Fl_Group(3 * WB + 2 * BW, WB, BW, BH);
@@ -453,17 +453,17 @@ helpWindow::helpWindow()
 #else
     o->tooltip("Filter list");
 #endif
-    o->box(FL_DOWN_BOX);
-    o->color(FL_BACKGROUND2_COLOR);
-    search = new Fl_Input(3 * WB + 2 * BW + BH, WB + 2, BW - BH - 2, BH - 4,
-                          "@gmsh_search");
-    search->box(FL_FLAT_BOX);
-    search->callback(help_options_cb);
-    search->when(FL_WHEN_CHANGED);
-    // search->take_focus(); cannot call this here - it triggers show() on Linux
-    // in fltk 1.3.3
-    o->resizable(search);
-    o->end();
+    // o->box(FL_DOWN_BOX);
+    // o->color(FL_BACKGROUND2_COLOR);
+    // search = new Fl_Input(3 * WB + 2 * BW + BH, WB + 2, BW - BH - 2, BH - 4,
+    //                       "@gmsh_search");
+    // // search->box(FL_FLAT_BOX);
+    // // search->callback(help_options_cb);
+    // search->when(FL_WHEN_CHANGED);
+    // // search->take_focus(); cannot call this here - it triggers show() on Linux
+    // // in fltk 1.3.3
+    // o->resizable(search);
+    // o->end();
 
     browser = new Fl_Browser(0, BH + 2 * WB, width, height - 2 * BH - 4 * WB);
     browser->box(GMSH_SIMPLE_TOP_BOX);
@@ -484,7 +484,7 @@ helpWindow::helpWindow()
       g2->end();
       Fl_Return_Button *o = new Fl_Return_Button(
         width - BB - WB, height - BH - WB, BB, BH, "Update");
-      o->callback(help_options_cb);
+      // o->callback(help_options_cb);
       g->end();
     }
 
