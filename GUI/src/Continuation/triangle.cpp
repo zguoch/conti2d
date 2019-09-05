@@ -346,6 +346,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//if not define this , it will failed on windows system
 #ifndef NO_TIMER
 #include <sys/time.h>
 #endif /* not NO_TIMER */

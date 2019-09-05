@@ -595,45 +595,34 @@ string cContinuation::UWC_p2p(string inputfilename,string outputfilename,double 
     cout<<"calculating uwc: "<<num_thread<<" threads are used"<<endl;
     UWC_Gij(outdata,G_firstRow, indata,grdhead,num_thread);
     cout << "Finished\n";
-    //4. write result
+    // 4. write result
     // string basename_infile=Path_GetBaseName(inputfilename);
-    // string ext_outputfile=Path_GetExtName(outputfilename);
-    // if(ext_outputfile=="grd" || ext_outputfile=="GRD")
-    // {
-    //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
-    //     if (!SaveGrd(outputfilename, grdhead, outdata,extNum))return ;
-    // }else if(ext_outputfile=="vtk" || ext_outputfile=="VTK")
-    // {
-    //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
-    //     SaveGrd2VTK(outputfilename,grdhead,outdata,height2);
-    //     string filename_outfile=Path_GetFileName(outputfilename);
-    //     SaveGrd2VTK(filename_outfile+"_origin.vtk",grdhead,indata,height1);//save the origin data as well
-    // }else if(ext_outputfile=="xyz" || ext_outputfile=="txt" || ext_outputfile=="dat")
-    // {
-    //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
-    //     SaveGrd2xyz(outputfilename, grdhead, outdata,extNum);
-    // }else if(ext_outputfile=="nc")
+    string ext_outputfile=getExtName(outputfilename);
+    if(ext_outputfile=="grd" || ext_outputfile=="GRD")
+    {
+        // cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+        if (!SaveGrd(outputfilename, grdhead, outdata,extNum))return "";
+    }
+    else if(ext_outputfile=="vtk" || ext_outputfile=="VTK")
+    {
+        // cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+        SaveGrd2VTK(outputfilename,grdhead,outdata,height2);
+        // string filename_outfile=Path_GetFileName(outputfilename);
+        // SaveGrd2VTK(filename_outfile+"_origin.vtk",grdhead,indata,height1);//save the origin data as well
+    }else if(ext_outputfile=="xyz" || ext_outputfile=="txt" || ext_outputfile=="dat")
+    {
+        // cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+        SaveGrd2xyz(outputfilename, grdhead, outdata,extNum);
+    }
+    // else if(ext_outputfile=="nc")
     // {
     //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
     //     SaveGrd2netCDF(outputfilename, grdhead, outdata,extNum);
     // }
-    // else
-    // {
-    //     cout<<RED<<"The output file format is not supported: "<<ext_outputfile<<COLOR_DEFALUT<<endl;
-    // }
-    
-    // //5. compute error if exact solution is given
-    // if(filename_exact!="")
-    // {
-    //     double* exactsolution = NULL;
-    //     if (!(exactsolution = ReadGrd(filename_exact, grdhead,extNum)))return ;
-    //     for(int i=0;i<modelnum;i++)
-    //     {
-    //         outdata[i]=outdata[i]-exactsolution[i];
-    //     }
-    //     if (!SaveGrd(outputfilename+"_error.grd", grdhead, outdata,extNum))return ;
-    //     delete[] exactsolution;
-    // }
+    else
+    {
+        cout<<RED<<"The output file format is not supported: "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+    }
     
     //delete data array
     delete[] indata;
@@ -853,4 +842,128 @@ double cContinuation::GetGij(const int i, const int j, double* firstRow, const G
     int col0=abs(index_row-index_col);                 
     Gij=firstRow[index_block*grdhead.cols+col0];
     return Gij;
+}
+
+bool cContinuation::SaveGrd(string filename, GrdHead grdhead, double* data,int extNum, bool savexxyz,bool isInfo)
+{
+    if(isInfo)cout<<filename<<GREEN<<" saved"<<COLOR_DEFALUT<<endl;
+    ofstream fout(filename);
+    if (!fout)
+    {
+        cout<<RED << "Open file false: "<<COLOR_DEFALUT << filename << "\n";
+        return false;
+    }
+    //compute zmin and zmax
+    double zmin=data[0];
+    double zmax=zmin;
+    int num_data=grdhead.rows*grdhead.cols;
+    int index0=0;
+    for (int i=extNum; i<grdhead.rows-extNum; i++) 
+    {
+        for(int j=extNum;j<grdhead.cols-extNum;j++)
+        {
+            if (zmin>data[index0]) {
+            zmin=data[index0];
+            }
+            if (zmax<data[index0]) {
+                zmax=data[index0];
+            }
+        }
+    }
+    grdhead.bounds[4]=zmin;
+    grdhead.bounds[5]=zmax;
+    double dx=(grdhead.bounds[1]-grdhead.bounds[0])/(grdhead.cols-1);
+    double dy=(grdhead.bounds[3]-grdhead.bounds[2])/(grdhead.rows-1);
+    //write head
+    fout << "DSAA\n";
+    fout << grdhead.cols-2*extNum<<"\t";
+    fout << grdhead.rows-2*extNum<<"\n";
+    fout << grdhead.bounds[0]+extNum*dx<<"\t";
+    fout << grdhead.bounds[1]-extNum*dx<<"\n";
+    fout << grdhead.bounds[2]+extNum*dy<<"\t";
+    fout << grdhead.bounds[3]-extNum*dy<<"\n";
+    fout << grdhead.bounds[4]<<"\t";
+    fout << grdhead.bounds[5]<<"\n";
+    //write data
+    for (int i = extNum; i < grdhead.rows-extNum; i++)
+    {
+        for (int j = extNum; j < grdhead.cols-extNum; j++)
+        {
+            fout << data[j+grdhead.cols*i]<<" ";
+        }
+        fout << "\n";
+    }
+    fout.close();
+    
+    return true;
+}
+
+ int cContinuation::SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z)
+{
+    //vtk format
+    ofstream fout(outputfile);
+    if(!fout)
+    {
+        // cout<<"["<<RED<<"error"<<COLOR_DEFALUT<<"]open file failed: "<<outputfile+".vtk"<<endl;
+        exit(0);
+    }
+    double dx=(grdhead.bounds[1]-grdhead.bounds[0])/(grdhead.cols-1);
+    double dy=(grdhead.bounds[3]-grdhead.bounds[2])/(grdhead.rows-1);
+    int num_pt=grdhead.cols*grdhead.rows;
+    fout<<"# vtk DataFile Version 2.0"<<endl;
+    fout<<"VTK from vtk2gm"<<endl;
+    fout<<"ASCII"<<endl;
+    fout<<"DATASET STRUCTURED_GRID"<<endl;
+    fout<<"DIMENSIONS "<<grdhead.cols<<" "<<grdhead.rows<<" 1"<<endl;
+    fout<<"POINTS "<<num_pt<<" float"<<endl;
+    int index=0;
+    for(int iy=0;iy<grdhead.rows;iy++)
+    {
+        for(int ix=0;ix<grdhead.cols;ix++)
+        {
+            fout<<grdhead.bounds[0]+ix*dx<<" "
+                <<grdhead.bounds[2]+iy*dy<<" "
+                <<z<<" ";
+            index++;
+        }
+    }fout<<endl;
+    fout<<"POINT_DATA "<<num_pt<<endl;
+    fout<<"SCALARS PotentialField float"<<endl;
+    fout<<"LOOKUP_TABLE default"<<endl;
+    for(int i=0;i<num_pt;i++)
+    {
+        fout<<data[i]<<" ";
+    }fout<<endl;
+    fout.close();
+    // cout<<"Output VTK file of result finished"<<endl;
+    return 0;
+}
+
+
+bool cContinuation::SaveGrd2xyz(string filename, GrdHead grdhead, double* data,int extNum,bool isInfo)
+{
+    //save xyz format as well
+    ofstream fxyz(filename);
+    if (!fxyz)
+    {
+        // cout<<RED << "Open file false: "<<COLOR_DEFALUT << filename << "\n";
+        return false;
+    }else
+    {
+        if(isInfo)cout<<filename<<GREEN<<" saved"<<COLOR_DEFALUT<<endl;
+    }
+    double dx=(grdhead.bounds[1]-grdhead.bounds[0])/(grdhead.cols-1);
+    double dy=(grdhead.bounds[3]-grdhead.bounds[2])/(grdhead.rows-1);
+    for(int i=extNum;i<grdhead.rows-extNum;i++)
+    {
+        for(int j=extNum;j<grdhead.cols-extNum;j++)
+        {
+            fxyz<<grdhead.bounds[0]+j*dx<<"\t"
+                <<grdhead.bounds[2]+i*dy<<"\t"
+                <<data[j+grdhead.cols*i]
+                <<endl;
+        }
+    }
+    fxyz.close();
+    return true;
 }

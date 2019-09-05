@@ -59,6 +59,9 @@ public:
     string getBaseName(string );/**< e.g., input xx/xxx/file.txt, return xx/xxx/file */
     int ReadXYZ(string FileName, cTriMesh& trimesh);
     double* ReadGrd(string filename, GrdHead& grdhead,int extNum=0);
+    bool SaveGrd(string filename, GrdHead grdhead,double* data,int extNum, bool savexxyz=false,bool isInfo=true);
+    int SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z=0);
+    bool SaveGrd2xyz(string filename, GrdHead grdhead, double* data,int extNum,bool isInfo=true);
     string Grid2Gmsh(string FileName,string Name_data="Original Field");//surfer grid file to gmsh 
     int WriteGmsh();
     int CheckOpts();

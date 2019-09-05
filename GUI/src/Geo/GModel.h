@@ -19,7 +19,7 @@
 #include "SBoundingBox3d.h"
 #include "MFaceHash.h"
 #include "MEdgeHash.h"
-
+// #include "Continuation.h"
 // TODO C++11 remove this nasty stuff
 #if __cplusplus >= 201103L
 #include <unordered_map>

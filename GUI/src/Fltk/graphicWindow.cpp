@@ -184,6 +184,8 @@ static void file_open_grd(Fl_Widget * w, void *data)
           conti.m_InputFile=fileChooserGetName(1);
           string gmshfile=conti.Grid2Gmsh(conti.m_InputFile); //transform grid file to gmsh
           OpenProject(gmshfile);
+          GModel::current()->getFileName();
+          conti.UWC_p2p(conti.m_InputFile,"uwc.vtk",0,5,0,5);
         }
         else
           // MergeFile(fileChooserGetName(i));
@@ -195,7 +197,10 @@ static void file_open_grd(Fl_Widget * w, void *data)
       // else if(onelabUtils::haveSolverToRun())
       //   onelab_cb(0, (void *)"check");
       drawContext::global()->draw();
+
+      
     }
+
   }
   static void file_open_merge_cb(Fl_Widget * w, void *data)
   {
