@@ -11,6 +11,8 @@
 #ifndef CONTINUATION_H
 #define CONTINUATION_H
 #include "stdfunc.h"
+#include "GModel.h"
+// #include "omp.h"
 // =========triangle===========
 #ifdef SINGLE
 #define REAL float
@@ -30,6 +32,11 @@
 // constants definition
 #define PI 3.141592653
 
+struct GrdHead
+{
+    int cols, rows;
+    double bounds[6];
+};
 // // define actions for conti main program
 // #define ACTION_CONTINUATION 1  //continuation of potential field data, if -C option is set
 // #define ACTION_DISCRITIZATION 2 //discritization of observation scatter points, if -D is set
@@ -51,10 +58,24 @@ public:
     string getPath(string );/**< e.g., input xx/xxx/file.txt, return xx/xxx */
     string getBaseName(string );/**< e.g., input xx/xxx/file.txt, return xx/xxx/file */
     int ReadXYZ(string FileName, cTriMesh& trimesh);
+    double* ReadGrd(string filename, GrdHead& grdhead,int extNum=0);
+    string Grid2Gmsh(string FileName,string Name_data="Original Field");//surfer grid file to gmsh 
     int WriteGmsh();
     int CheckOpts();
     int update();
-    int run(); /**< run the main program according to the options */
+    string UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread);
+    //kernel
+    //Equation 4
+    void GetPmnij(double* Pmnij,int rows,int cols,double dx,double dy,double rph,double xm,double ym);
+    int Getkernel_p2p_new(GrdHead grdhead, double rph, double* kernel_firstRow, int num_thread);
+    int Getkernel_p2p_new(GrdHead grdhead, double rph, double** kernel, int num_thread);
+    // calculate upward continuation: b=Gx
+    void UWC_Gij(double* b, double* G,double* x, GrdHead grdhead, int num_thread=1);
+    //calculate upward continuation: b=Gx
+    void UWC_Gij(double* b,double** G,double* x, int modelnum,int num_thread=1);
+    // Get i row j column element of kernel matrix
+    double GetGij(const int i, const int j, double* firstRow, const GrdHead grdhead);
+
 public: /*public data*/
     cTriMesh m_triMESH;
     string m_InputFile;
@@ -70,26 +91,7 @@ private:
     void init_triangulateio(struct triangulateio& tri );
     void free_triangulateio(struct triangulateio& tri );
     int init();
-    /**
-     * @brief Calculate continuation coefficient, \f$ C_i \f$ , of a vertex centered polygon
-     * 
-     * \f$ \iint\limits_{{S_i}} {\frac{{U(\alpha ,\beta ,{z_0})}}{{{R^3}}}d\alpha d\beta } = U(\alpha ,\beta ,{z_0})\sum\limits_{j = 1}^n {({A_{j2}} - {A_{j1}} + {B_{j2}} - {B_{j1}})}  = {U_i}{C_i} \f$
-     * @param alpha x-like coordinate of observation point \f$ Q_i \f$ on the plane for a upward continuation quation (Figure 2 of Guo and Zhang(2019))
-     * @param beta x-like coordinate ...
-     * @param polygon vertex (\f$ Q_i \f$) centered polygon, contains nodes, connection of the polygon
-     * @return double coefficient of \f$ C_i \f$
-     */
-    double kernel(int index_Q,double deltaZ,double P[3], const cPolyMesh* polygon);
-    /**
-     * @brief calculate coefficience of a edge. The observation point is Q, and the start point of the edge vector is V1.
-     * 
-     * @param Q 
-     * @param V1 
-     * @param V2
-     * @param deltaZ 
-     * @return double 
-     */
-    double kernel_edge(double deltaZ,const double V1[2],const double V2[2],const double P[3]);
+    
 };
 
 #endif

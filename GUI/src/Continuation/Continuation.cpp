@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2019
  * 
  */
-#include "continuation.h"
+#include "Continuation.h"
 
 cContinuation::cContinuation(string FileName):
 m_typeFileFormat(FMT_UNKNOWN)
@@ -65,8 +65,11 @@ int cContinuation::ReadFile()
             m_triMESH.numberofelements=triangle(m_triMESH);
             Info("Discritization of observation points is done.");
         }
-        
         break;
+    case FMT_GRID_SURF:
+        {
+
+        }
     default:
         break;
     }
@@ -240,6 +243,111 @@ int cContinuation::ReadXYZ(string FileName, cTriMesh& trimesh)
     return 0;
 }
 
+string cContinuation::Grid2Gmsh(string FileName,string Name_data)
+{
+    string gmshfile=getFileName(FileName)+".gmsh";
+    Msg::Info("Reading surfer grid file and display on GUI");
+    ifstream fin;
+    fin.open(FileName, ios::in);
+    if (!fin)
+    {
+        Msg::Error("Open file failed: %s",FileName.c_str());
+        return "";
+    }
+    string dsaa;
+    int nx,ny;
+    double bounds[6];
+    //read head
+    fin >> dsaa;
+    if(dsaa=="DSAA")
+    {
+        Msg::Info("The grd file in ASCII");
+    }else{
+        Msg::Error("Input grd file is Binary. Please convert it to ascii: https://convert.goldensoftware.com/Application/Conversion");
+        return "";
+    }
+    fin >> nx;
+    fin >> ny;
+
+    for (int i = 0; i < 6; i++)
+    {
+        fin >> bounds[i];
+    }
+    double dx=(bounds[1]-bounds[0])/(nx-1);
+    double dy=(bounds[3]-bounds[2])/(ny-1);
+    //read data
+    double* data = new double[nx*ny];
+    for (int i = 0; i < ny; i++)
+    {
+        for (int j = 0; j < nx; j++)
+        {
+            fin >> data[j+nx*i];
+        }
+    }
+    fin.close();
+    //transform to gmsh
+    ofstream fout(gmshfile);
+    if (!fin)
+    {
+        Msg::Error("Open file failed: %s",FileName.c_str());
+        return "";
+    }else
+    {
+        Msg::Info("Save grd file to gmsh: %s",gmshfile.c_str());
+    }
+    fout<<"$MeshFormat"<<endl;
+    fout<<"2.2 0 8"<<endl;
+    fout<<"$EndMeshFormat"<<endl;
+    fout<<"$Nodes"<<endl;
+    fout<<nx*ny<<endl;
+    for(int i=0;i<ny;i++)
+    {
+        for(int j=0;j<nx;j++)
+        {
+            fout<<j+i*nx+1<<" "
+                <<bounds[0]+dx*j<<" "
+                <<bounds[2]+dy*i<<" "
+                <<0<<endl;
+        }
+    }
+    fout<<"$EndNodes"<<endl;
+    fout<<"$Elements"<<endl;
+    int nx_el=nx-1,ny_el=ny-1;
+    int nel=nx_el*ny_el;
+    fout<<nel<<endl;
+    for(int i=0;i<ny_el;i++)
+    {
+        for(int j=0;j<nx_el;j++)
+        {
+            int index_LL=j+i*nx+1;
+            int index_TL=j+(i+1)*nx+1;
+            fout<<j+i*nx_el+1<<" "
+                <<3<<" 2 1 1 "
+                <<index_LL<<" "
+                <<index_LL+1<<" "
+                <<index_TL+1<<" "
+                <<index_TL<<endl;
+        }
+    }
+    fout<<"$EndElements"<<endl;
+    //write data
+    fout<<"$NodeData"<<endl;
+    fout<<1<<endl;
+    fout<<"\""<<Name_data<<"\""<<endl;
+    fout<<"1 \n0 \n3 \n0 \n1"<<endl;
+    fout<<nx*ny<<endl;
+    for(int i=0;i<ny*nx;i++)
+    {
+        // for(int j=0;j<nx;j++)
+        {
+            fout<<i+1<<" "<<data[i]<<endl;
+        }
+    }
+    fout<<"$EndNodeData"<<endl;
+    fout.close();
+    delete[]  data;
+    return gmshfile;
+}
 int cContinuation::Info(string info, int level)
 {
     if(level==0)return 0;
@@ -318,41 +426,7 @@ int cContinuation::CheckOpts()
     if(m_OutputFile=="")ERR("You have to give the output file by -O option.");
     return 0;
 }
-int cContinuation::run()
-{
-    Info("=============running main program=============");
-    // 1. 
-    if(m_Action_Discritization) //write geo file of vertex centered polygon
-    {
-        m_triMESH.m_vertexCenteredPolygons.WriteGeometry2Gmsh(getFileName(m_OutputFile)+".geo");
-        Info("Write vertex centered polygon geometry, done!");
-    }
-    // 2. calculate kernel matrix
-    //TODO deltaZ的传入和处理
-    double zp=0;
-    int i=100;
-    for(int i=0;i<m_triMESH.numberofpoints;i++)
-    {
-        double P[3]={m_triMESH.m_nodes[i].x,m_triMESH.m_nodes[i].y,zp};
-        // double Q[3]={m_triMESH.m_nodes[i].x,m_triMESH.m_nodes[i].y,m_triMESH.m_nodes[i].z};
-        double deltaZ=zp-m_triMESH.m_nodes[i].z;
-        if(m_triMESH.m_vertexCenteredPolygons.el2nod[i].size()==6)
-        {
-            double Ci=kernel(i,deltaZ,P,&m_triMESH.m_vertexCenteredPolygons);
-            cout<<"第 "<<i<<" 个观测点的延拓系数为： "<<Ci<<endl;
-            // exit(0);
-            i=m_triMESH.numberofpoints;
-        }
-    }
-    
-    //-1. 
-    if(m_Action_Continuation || m_Action_Discritization)
-    {
-        WriteFile();
-    }
-    
-    return 0;
-}
+
 /**
  * @brief Write mesh and field data to gmsh file
  * 
@@ -416,130 +490,366 @@ int cContinuation::WriteFile()
     }
     return 0;
 }
-/**
- * @brief The kernel coefficient \f$ C_i \f$ is calculated by summing coefficient of each edge.
- * 
- * \f$ \iint\limits_{{S_i}} {\frac{{U(\alpha ,\beta ,{z_0})}}{{{R^3}}}d\alpha d\beta } = U(\alpha ,\beta ,{z_0})\sum\limits_{j = 1}^n {({A_{j2}} - {A_{j1}} + {B_{j2}} - {B_{j1}})}  = {U_i}{C_i} \f$
- * 
- * For the \f$ j_{th} \f$ edge, the coefficient of \f$ A_{j2}, A_{j1}, B_{j2}, B_{j1} \f$ are calculated using following formulates (definite integral),
- * 
- * \f$ {A_{j2}} - {A_{j1}} =  - \frac{{cos\theta }}{{2\Delta z}}\arctan \left( {\frac{{(\alpha ' - x)({{\beta '}_0} - y)}}{{\Delta z\sqrt {{{(\alpha ' - x)}^2} + {{({{\beta '}_0} - y)}^2} + \Delta {z^2}} }}} \right)|_{{{\alpha '}_{j1}}}^{{{\alpha '}_{j2}}} \f$
- * 
- * \f$ {B_{j2}} - {B_{j1}} = \frac{{cos\theta }}{{2\Delta z}}\arctan \left( {\frac{{({{\alpha '}_0} - x)(\beta ' - y)}}{{\Delta z\sqrt {{{({{\alpha '}_0} - x)}^2} + {{(\beta ' - y)}^2} + \Delta {z^2}} }}} \right)|_{{{\beta '}_{j1}}}^{{{\beta '}_{j2}}} \f$
- * 
- * The coordinate system of \f$ \alpha^{\prime}-O-\beta^{\prime} \f$ is transformed by two steps. 
- * (1) Translation the original point of coordinate system \f$ \alpha-O-\beta \f$ to the start point of the edge vector (e.g., \f$ \vec{V_1V_2} \f$), 
- * which direction meets right hand rule.
- * (2) Rotate the translated coordinate system to make sure the positive direction of \f$ \alpha-axis \f$ same as the edge vector.
- * The transform matrix as following,
- * 
- * \f$ \left[ {\begin{array}{*{20}{c}}
-    {\alpha '} \\ 
-    {\beta '} 
-    \end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
-    {\cos \theta }&{ - \sin \theta } \\ 
-    {\sin \theta }&{\cos \theta } 
-    \end{array}} \right]\left[ {\begin{array}{*{20}{c}}
-    {\alpha  - {\alpha _1}} \\ 
-    {\beta  - {\beta _1}} 
-    \end{array}} \right] \f$
- * 
- * @param index_Q 
- * @param Q Coordinates of observation point \f$ Q \f$, on the plane surface at a lower level 
- * @param P Coordinates of observation point \f$ P \f$, on a surface at a higher level. 
- * z value of P always greater than Q.
- * @param cPolyMesh
- * @return double 
- */
-double cContinuation::kernel(int index_Q,double deltaZ,double P[3], const cPolyMesh* polygon)
-{
-    cout<<"共有 "<<polygon->el2nod[index_Q].size()<<" 个棱"<<endl;
-    //获取第一个edge的坐标
-    int num_edges=polygon->el2nod[index_Q].size();      /**< The edges number of the polygon */
-    // double Q2[2]={Q[0],Q[1]};                          /**< Coordinates of the observation point \f$ Q_i \f$ */
 
-    int index_v1=polygon->el2nod[index_Q][num_edges-1]; /**< Start point index of a edge vector */
-    int index_v2=polygon->el2nod[index_Q][0];           /**< End point index of the edge vector */
-    double V1[2]={polygon->x[index_v1],polygon->y[index_v1]};   /**< Coordinate of the start point of the edge vector */
-    double V2[2]={polygon->x[index_v2],polygon->y[index_v2]};   /**< Coordinate of the end point of the edge vector */
-    double Ci=kernel_edge(deltaZ,V1,V2,P);
-    cout<<Ci<<endl;
-    for(int i=0;i<num_edges-1;i++)
+double* cContinuation::ReadGrd(string filename, GrdHead& grdhead,int extNum)
+{
+    ifstream fin;
+    fin.open(filename, ios::in);
+    if (!fin)
     {
-        cout<<"The "<<i<<"th edge"<<endl;
-        index_v1=polygon->el2nod[index_Q][i];
-        index_v2=polygon->el2nod[index_Q][i+1];
-        V1[0]=polygon->x[index_v1]; V1[1]=polygon->y[index_v1];
-        V2[0]=polygon->x[index_v2]; V2[1]=polygon->y[index_v2];
-        double cc=kernel_edge(deltaZ,V1,V2,P);
-        Ci+=cc;
-        cout<<cc<<endl;
+        Msg::Error("Open file failed: %s",filename.c_str());
+        return NULL;
     }
-    return Ci/(2*PI);
+    string dsaa;
+    //read head
+    fin >> dsaa;
+    if(dsaa=="DSAA")
+    {
+        Msg::Info("The grd file in ASCII");
+    }else{
+        Msg::Error("Input grd file is Binary. Please convert it to ascii: https://convert.goldensoftware.com/Application/Conversion");
+        return NULL;
+    }
+    fin >> grdhead.cols;
+    fin >> grdhead.rows;
+    for (int i = 0; i < 6; i++)
+    {
+        fin >> grdhead.bounds[i];
+    }
+    double dx=(grdhead.bounds[1]-grdhead.bounds[0])/(grdhead.cols-1);
+    double dy=(grdhead.bounds[3]-grdhead.bounds[2])/(grdhead.rows-1);
+    grdhead.bounds[0]-=extNum*dx;
+    grdhead.bounds[1]+=extNum*dx;
+    grdhead.bounds[2]-=extNum*dy;
+    grdhead.bounds[3]+=extNum*dy;
+    grdhead.cols+=2*extNum;
+    grdhead.rows+=2*extNum;
+    //read data
+    double* data = new double[grdhead.rows*grdhead.cols];
+    for (int i = extNum; i < grdhead.rows-extNum; i++)
+    {
+        for (int j = extNum; j < grdhead.cols-extNum; j++)
+        {
+            fin >> data[j+grdhead.cols*i];
+        }
+    }
+    //extend as zero
+    int index0=extNum;
+    for(int i=0;i<extNum;i++)
+    {
+        for(int j=extNum;j<grdhead.rows-extNum;j++)
+        {
+            data[j+grdhead.cols*i]=data[index0+grdhead.cols*i];
+        }
+    }
+    index0=grdhead.cols-extNum-1;
+    for(int i=grdhead.cols-extNum;i<grdhead.cols;i++)
+    {
+        for(int j=extNum;j<grdhead.rows-extNum;j++)
+        {
+            data[j+grdhead.cols*i]=data[index0+grdhead.cols*i];
+        }
+    }
+    //extend y direction (row direction)
+    index0=extNum;
+    for(int i=0;i<grdhead.cols;i++)
+    {
+        for(int j=0;j<extNum;j++)
+        {
+            data[j+grdhead.cols*i]=data[j+grdhead.cols*index0];
+        }
+    }
+    index0=grdhead.rows-extNum-1;
+    for(int i=0;i<grdhead.cols;i++)
+    {
+        for(int j=grdhead.rows-extNum;j<grdhead.rows;j++)
+        {
+            data[j+grdhead.cols*i]=data[j+grdhead.cols*index0];
+        }
+    }
+    fin.close();
+    return data;
 }
-/**
- * @brief First calculate new coordinate of Q in the local coordinate system \f$ \alpha^{prime}-O-\beta^{\prime} \f$
- * the transform matrix as following,
- * 
- * \f$ \left[ {\begin{array}{*{20}{c}}
-    {\alpha '} \\ 
-    {\beta '} 
-    \end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
-    {\cos \theta }&{ - \sin \theta } \\ 
-    {\sin \theta }&{\cos \theta } 
-    \end{array}} \right]\left[ {\begin{array}{*{20}{c}}
-    {\alpha  - {\alpha _1}} \\ 
-    {\beta  - {\beta _1}} 
-    \end{array}} \right] \f$
+
+string cContinuation::UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread)
+{
+    cout << "***************************************************\n";
+    cout << " Upward continuation from plane to plane:"<<height1<<"->"<<height2<<endl;
+    cout << "***************************************************\n";
+    //1. read grd data
+    GrdHead grdhead;
+    double* indata = NULL;
+    if (!(indata = ReadGrd(inputfilename, grdhead,extNum)))return "";
+    int modelnum = grdhead.rows*grdhead.cols;
+    //2. height of continuation
+    double rph=fabs(height1-height2);
+
+    //3. kernel mat.
+    double* G_firstRow=new double[modelnum];
+    cout<<"calculating kernal matrix"<<endl;
+    Getkernel_p2p_new(grdhead,rph,G_firstRow,num_thread);
     
-    the angle \f$ \theta \f$ can be calculated from cross and dot of axis vector and edge vector.
- * @param Q 
- * @param V1 
- * @param V2 
- * @param P 
+    //4. outdata
+    double *outdata=new double[modelnum];
+    //compute UWC
+    cout<<"calculating uwc: "<<num_thread<<" threads are used"<<endl;
+    UWC_Gij(outdata,G_firstRow, indata,grdhead,num_thread);
+    cout << "Finished\n";
+    //4. write result
+    // string basename_infile=Path_GetBaseName(inputfilename);
+    // string ext_outputfile=Path_GetExtName(outputfilename);
+    // if(ext_outputfile=="grd" || ext_outputfile=="GRD")
+    // {
+    //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+    //     if (!SaveGrd(outputfilename, grdhead, outdata,extNum))return ;
+    // }else if(ext_outputfile=="vtk" || ext_outputfile=="VTK")
+    // {
+    //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+    //     SaveGrd2VTK(outputfilename,grdhead,outdata,height2);
+    //     string filename_outfile=Path_GetFileName(outputfilename);
+    //     SaveGrd2VTK(filename_outfile+"_origin.vtk",grdhead,indata,height1);//save the origin data as well
+    // }else if(ext_outputfile=="xyz" || ext_outputfile=="txt" || ext_outputfile=="dat")
+    // {
+    //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+    //     SaveGrd2xyz(outputfilename, grdhead, outdata,extNum);
+    // }else if(ext_outputfile=="nc")
+    // {
+    //     cout<<GREEN<<"Output file format is : "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+    //     SaveGrd2netCDF(outputfilename, grdhead, outdata,extNum);
+    // }
+    // else
+    // {
+    //     cout<<RED<<"The output file format is not supported: "<<ext_outputfile<<COLOR_DEFALUT<<endl;
+    // }
+    
+    // //5. compute error if exact solution is given
+    // if(filename_exact!="")
+    // {
+    //     double* exactsolution = NULL;
+    //     if (!(exactsolution = ReadGrd(filename_exact, grdhead,extNum)))return ;
+    //     for(int i=0;i<modelnum;i++)
+    //     {
+    //         outdata[i]=outdata[i]-exactsolution[i];
+    //     }
+    //     if (!SaveGrd(outputfilename+"_error.grd", grdhead, outdata,extNum))return ;
+    //     delete[] exactsolution;
+    // }
+    
+    //delete data array
+    delete[] indata;
+    delete[] outdata;
+    delete[] G_firstRow;
+
+    return "";
+}
+
+/**
+ * @brief Ger complete kernel matrix for upward continuation from plane to plane.
+ * 
+ * @param grdhead 
+ * @param rph (\f$ \Delta z \f$ in equation 4) Height or vertical distance for the upward continuation. 
+ * @param kernel 
+ * @param num_thread 
+ * @return int 
+ */
+int cContinuation::Getkernel_p2p_new(GrdHead grdhead, double rph, double** kernel, int num_thread)
+{
+    cout<<"new kernel of plane to surface: "<<num_thread<<" threads are used"<<endl;
+    double dx=(grdhead.bounds[1]-grdhead.bounds[0])/(grdhead.cols-1);
+    double dy=(grdhead.bounds[3]-grdhead.bounds[2])/(grdhead.rows-1);
+    int datanum=grdhead.rows*grdhead.cols;
+    //omp parallel
+    // omp_set_num_threads(num_thread);
+    // ProgressBar bar0(grdhead.rows);
+    // MultiProgressBar multibar(grdhead.rows,COLOR_BAR_BLUE);
+    #pragma omp parallel for shared(grdhead,dx,dy,kernel) 
+    for(int irow=0; irow<grdhead.rows; irow++)
+    {
+        double yup=irow*dy;
+        for(int icol=0; icol<grdhead.cols; icol++)
+        {
+            double* vector_row_K=new double[datanum];
+            //=============================calculate Pmnij=======================
+            int index_col_k=icol+irow*grdhead.cols;
+            double xup=icol*dx;
+            // double rph=topo2[index_col_k]-h1;
+            GetPmnij(vector_row_K,grdhead.rows,grdhead.cols,dx,dy,rph,xup,yup);
+            for(int k=0;k<datanum;k++)
+            kernel[index_col_k][k]=vector_row_K[k];
+            //====================================================================
+            delete[] vector_row_K;
+        }
+        #pragma omp critical
+        // multibar.Update();
+    }cout<<"\n";
+    return 0;
+}
+
+/**
+ * @brief Ger the first row of kernel matrix for upward continuation from plane to plane.
+ * 
+ * @param grdhead 
+ * @param rph \f$ \Delta z \f$
+ * @param kernel_firstRow 
+ * @param num_thread 
+ * @return int 
+ */
+int cContinuation::Getkernel_p2p_new(GrdHead grdhead, double rph, double* kernel_firstRow, int num_thread)
+{
+    cout<<"calculating first row of new kernel"<<endl;
+    // double xup=0,yup=0;
+    double dx=(grdhead.bounds[1]-grdhead.bounds[0])/(grdhead.cols-1);
+    double dy=(grdhead.bounds[3]-grdhead.bounds[2])/(grdhead.rows-1);
+    int datanum=grdhead.rows*grdhead.cols;
+    
+    GetPmnij(kernel_firstRow,grdhead.rows,grdhead.cols,dx,dy,rph,0,0);
+    
+    return 1;
+}
+
+/**
+ * @brief Get the kernel vector for a calculation point \f$ (x_m, y_m) \f$. 
+ * 
+ * See equation 4 in the manuscript.
+ * 
+ * \f$ \begin{gathered}
+    {P_{m,n:i,j}} = \Delta z({x_m},{y_n})\int_{{\alpha _i} - \Delta x/2}^{{\alpha _i} + \Delta x/2} {\int_{{\beta _j} - \Delta y/2}^{{\beta _j} + \Delta y/2} {\frac{{d\alpha d\beta }}{{{R^3}}}} } {\text{  }} \\ 
+    \;\;\;\; = \arctan \left( {\frac{{(\alpha  - {x_m})(\beta  - {y_n})}}{{\Delta z({x_m},{y_n})\sqrt {{{(\alpha  - {x_m})}^2} + {{(\beta  - {y_m})}^2} + \Delta z{{({x_m},{y_n})}^2}} }}} \right)|_{{\alpha _i} - \Delta x/2}^{{\alpha _i} + \Delta x/2}|_{{\beta _j} - \Delta y/2}^{{\beta _j} + \Delta y/2} \\ 
+    \end{gathered} \f$
+ * 
+ * @param Pmnij 
+ * @param rows Points number in y direction.
+ * @param cols Points number in x direction.
+ * @param dx \f$ \Delta x \f$ in equation (4)
+ * @param dy \f$ \Delta y \f$ in equation (4)
+ * @param rph \f$ \Delta z \f$ in equation (4)
+ * @param xm \f$ x_m \f$ in equation (4)
+ * @param ym \f$ x_m \f$ in equation (4)
+ */
+void cContinuation::GetPmnij(double* Pmnij,int rows,int cols,double dx,double dy,double rph,double xm,double ym)
+{
+    double xup=xm;
+    double yup=ym;
+    double dx_2=dx/2.0;
+    double dy_2=dy/2.0;
+    double rph_2=rph*rph;
+    int index=0;
+    double p11,p12,p21,p22;
+    double x1,x2,y1,y2,x0,y0;
+    double x1x1,x2x2,y1y1,y2y2;
+    double ydown,xdown;
+    for (int i=0;i<rows;i++)
+    {
+        ydown=i*dy;
+        for(int j=0;j<cols;j++)
+        {
+            xdown=j*dx;
+            //------
+            x0=xup-xdown;
+            y0=yup-ydown;
+            x1=x0-dx_2;
+            x2=x0+dx_2;
+            y1=y0-dy_2;
+            y2=y0+dy_2;
+            
+            x1x1=x1*x1;
+            y1y1=y1*y1;
+            x2x2=x2*x2;
+            y2y2=y2*y2;
+            //--------
+            p22=atan2(x2*y2,rph*sqrt(rph_2+x2x2+y2y2));
+            p11=atan2(x1*y1,rph*sqrt(rph_2+x1x1+y1y1));
+            p12=atan2(x1*y2,rph*sqrt(rph_2+x1x1+y2y2));
+            p21=atan2(x2*y1,rph*sqrt(rph_2+x2x2+y1y1));
+            Pmnij[index]=(p22+p11-p21-p12)/(2*PI);
+            index++;
+        }
+    }
+}
+
+/**
+ * @brief Calculate upward continuation as \f$ b=\mathbf{G}x \f$, see equation (5). 
+ * This function is used several times in Landweber iteration steps.
+ * 
+ * @param b 
+ * @param G 
+ * @param x 
+ * @param modelnum 
+ * @param num_thread 
+ */
+void cContinuation::UWC_Gij(double* b,double** G,double* x, int modelnum,int num_thread)
+{
+    // omp_set_num_threads(num_thread);
+    #pragma omp parallel for shared(b,x,modelnum)
+    for (int i = 0; i < modelnum; i++)
+    {
+        b[i] = 0;
+        for (int j = 0; j < modelnum; j++)
+        {
+            b[i] += G[i][j]*x[j];
+        }
+    }
+}
+
+/**
+ * @brief Calculate upward continuation \f$ b=\mathbf{G}x \f$ just using the first row of the kernel matrix.
+ * Only valid for case of plane to plane.
+ * 
+ * @param b 
+ * @param G 
+ * @param x 
+ * @param grdhead 
+ * @param num_thread 
+ */
+void cContinuation::UWC_Gij(double* b, double* G,double* x, GrdHead grdhead, int num_thread)
+{
+    int modelnum = grdhead.rows*grdhead.cols;
+
+    // omp_set_num_threads(num_thread);
+    #pragma omp parallel for 				
+    for (int i = 0; i < modelnum; i++)
+    {
+        b[i] = 0;
+        for (int j = 0; j < modelnum; j++)
+        {
+            b[i] += GetGij(i,j,G,grdhead)*x[j];
+        }
+    }
+}
+
+/**
+ * @brief Get the i row and j column element  \f$ K_{ij} \f$ from the first row of the kernel matrix.
+ * 
+ * Corresponding to equation (7) in the manuscript.
+ * 
+ * \f$ \begin{array}{*{20}{c}}
+    {k\left( {m,n:i,j} \right) = k\left( {1,1:\left| {{i_0}} \right|,\left| {{j_0}} \right|} \right) \cdot sign({i_0}) \cdot sign({j_0})} \\ 
+    {{i_0} = (i - m),\;\;\;\;{j_0} = (j - n)} 
+    \end{array},\;sign(x) = \left\{ {\begin{array}{*{20}{c}}
+    {1,\;if\;x > 0} \\ 
+    {0,\;if\;x = 0} \\ 
+    { - 1,\;if\;x < 0} 
+    \end{array}} \right.\f$
+ * 
+ * @param i 
+ * @param j 
+ * @param firstRow 
+ * @param grdhead 
  * @return double 
  */
-double cContinuation::kernel_edge(double deltaZ,const double V1[2],const double V2[2],const double P[3])
+double cContinuation::GetGij(const int i, const int j, double* firstRow, const GrdHead grdhead)
 {
-    double x=P[0],y=P[1];
-    double deltaZ2=deltaZ*deltaZ;
-    double v1v2[2]={V2[0]-V1[0], V2[1]-V1[1]};
-    double length_v1v2=sqrt((v1v2[0])*(v1v2[0]) + (v1v2[1])*(v1v2[1]));
-    // 1. calculate cos(theta) and sin(theta)
-    double cross =v1v2[1];     
-    double dot =v1v2[0];        
-    double costheta=dot/length_v1v2;
-    double sintheta=cross/length_v1v2;
-    // 2. integral of t, t=0...length_v1v2
-    double alpha=0,beta=0;
-    double alpha1=V1[0],beta1=V1[1];
-    const int N_integral=100;
-    double dt=length_v1v2/N_integral;
-    double t=0,R=0;
-    double x_alpha=0,y_beta=0;  //(x-alpha),(y-beta)
-    double x_alpha_2=0,y_beta_2=0; //(x-alpha)^2, (y-beta)^2
-    double tmp1=0,tmp2=0;
-    // 
-    cout<<"  L: "<<length_v1v2<<" dt: "<<dt<<endl;
-    // cout<<" x2: "<<V2[0]<<" x2_cal: "<<alpha1+length_v1v2*costheta<<endl;
-    // cout<<" y2: "<<V2[1]<<" y2_cal: "<<beta1+length_v1v2*sintheta<<endl;
-    cout<<"  z^2: "<<deltaZ2<<" alpha1: "<<alpha1<<" beta1: "<<beta1<<" x: "<<x<<" y: "<<y<<endl;
-    cout<<"  costheta: "<<costheta<<" sintheta: "<<sintheta<<endl;
-    for(int i=0;i<N_integral;i++)
-    {
-        t=dt*(i+0.5);
-        // cout<<"      t= "<<t<<endl;
-        alpha=alpha1+t*costheta;
-        beta=beta1+t*sintheta;
-        x_alpha=x-alpha;
-        y_beta=y-beta;
-        x_alpha_2=x_alpha*x_alpha;
-        y_beta_2=y_beta*y_beta;
-        R=sqrt(x_alpha_2+y_beta_2+deltaZ2);
-        // P
-        tmp1=tmp1+y_beta*costheta/((deltaZ2 + x_alpha_2)*R);
-        tmp2=tmp2+x_alpha*sintheta/((deltaZ2 + y_beta_2)*R);
-    }
-
-    return (tmp2-tmp1)*dt*0.5;
+    double Gij;
+    int row_block, colum_block, count_block;
+    int modelnum = grdhead.rows*grdhead.cols;
+    int index_row=0;
+    int index_col=0;  
+    row_block = i / grdhead.cols;						
+    colum_block = j / grdhead.cols;					
+    index_row=i-row_block*grdhead.cols;                 
+    index_col=j-colum_block*grdhead.cols;               
+    int index_block=abs(row_block-colum_block);         
+    int col0=abs(index_row-index_col);                 
+    Gij=firstRow[index_block*grdhead.cols+col0];
+    return Gij;
 }

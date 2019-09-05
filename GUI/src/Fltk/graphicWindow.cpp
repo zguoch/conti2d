@@ -159,9 +159,9 @@ void UpwardContinuation_P2P(Fl_Widget *w, void *data)
     "Image - PNM" TT "*.pnm" NN "Image - PPM" TT "*.ppm" NN;
 
 static const char *input_formats_conti2d =
-    "All Files" TT "*.*" NN 
-    "Grid - Surfer 6" TT "*.grd" NN
-    "Grid - XYZ" TT "*.xyz" NN;
+    // "All Files" TT "*.*" NN 
+    "Grid - Surfer 6" TT "*.grd" NN;
+    // "Grid - XYZ" TT "*.xyz" NN;
 
 // open file for continuation
 static void file_open_grd(Fl_Widget * w, void *data)
@@ -182,10 +182,8 @@ static void file_open_grd(Fl_Widget * w, void *data)
           //first open grd file, then transfrom to gmsh to display
           cContinuation conti;
           conti.m_InputFile=fileChooserGetName(1);
-          conti.m_OutputFile="test.msh";
-          conti.update();
-          conti.WriteFile();
-          OpenProject(conti.m_OutputFile);
+          string gmshfile=conti.Grid2Gmsh(conti.m_InputFile); //transform grid file to gmsh
+          OpenProject(gmshfile);
         }
         else
           // MergeFile(fileChooserGetName(i));

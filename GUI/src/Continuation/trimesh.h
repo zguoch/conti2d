@@ -106,4 +106,5 @@ class cTriMesh
         void reConnect_Boundary(vector<int>& sharedTriangles,double x0,double y0,const double* xx,const double* yy);
         void MirrorPoint2(double p1[2],double p2[2],double& newX,double& newY);
 };
+
 #endif
