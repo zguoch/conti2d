@@ -288,6 +288,13 @@ if(MSVC)
   endif()
 endif()
 
+# use openmp manually, specify compile option of -fopenmp
+if(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "-fopenmp ${CMAKE_CXX_FLAGS}")
+    message(STATUS "利用g++实现openmp的使用，using g++-9 -fopenmp")   
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
+
 if(ENABLE_OPENMP)
   find_package(OpenMP)
   if(OPENMP_FOUND)
