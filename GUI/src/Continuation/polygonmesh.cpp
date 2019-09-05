@@ -39,7 +39,7 @@ void cPolyMesh::WriteGeometry2Gmsh(string outfile)
     ofstream fout(outfile);
     if(!fout)
     {
-        cout<<"Open file failed: "<<outfile<<endl;
+        //cout<<"Open file failed: "<<outfile<<endl;
         exit(0);
     }
     // write points

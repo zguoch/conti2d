@@ -70,26 +70,7 @@ private:
     void init_triangulateio(struct triangulateio& tri );
     void free_triangulateio(struct triangulateio& tri );
     int init();
-    /**
-     * @brief Calculate continuation coefficient, \f$ C_i \f$ , of a vertex centered polygon
-     * 
-     * \f$ \iint\limits_{{S_i}} {\frac{{U(\alpha ,\beta ,{z_0})}}{{{R^3}}}d\alpha d\beta } = U(\alpha ,\beta ,{z_0})\sum\limits_{j = 1}^n {({A_{j2}} - {A_{j1}} + {B_{j2}} - {B_{j1}})}  = {U_i}{C_i} \f$
-     * @param alpha x-like coordinate of observation point \f$ Q_i \f$ on the plane for a upward continuation quation (Figure 2 of Guo and Zhang(2019))
-     * @param beta x-like coordinate ...
-     * @param polygon vertex (\f$ Q_i \f$) centered polygon, contains nodes, connection of the polygon
-     * @return double coefficient of \f$ C_i \f$
-     */
-    double kernel(int index_Q,double deltaZ,double P[3], const cPolyMesh* polygon);
-    /**
-     * @brief calculate coefficience of a edge. The observation point is Q, and the start point of the edge vector is V1.
-     * 
-     * @param Q 
-     * @param V1 
-     * @param V2
-     * @param deltaZ 
-     * @return double 
-     */
-    double kernel_edge(double deltaZ,const double V1[2],const double V2[2],const double P[3]);
+   
 };
 
 #endif
