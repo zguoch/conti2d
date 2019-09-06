@@ -167,11 +167,7 @@ void DownwardContinuation_S2P(Fl_Widget *w, void *data)
 //     "Image - PNM" TT "*.pnm" NN "Image - PPM" TT "*.ppm" NN;
 
 
-static const char *input_formats_conti2d =
-    // "All Files" TT "*.*" NN 
-    "Grid - Surfer 6" TT "*.grd" NN;
-    // "Grid - XYZ" TT "*.xyz" NN;
-
+static const char *input_formats_conti2d ="Grid - Surfer 6" TT "*.grd" NN;
 
 static void showgrd_plane(string grdfile,string name_data="Grid Data",double z0=0)
 {

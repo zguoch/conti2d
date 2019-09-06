@@ -2468,7 +2468,7 @@ optionWindow::optionWindow(int deltaFontSize)
       mesh.butt[8]->tooltip("(Alt+Shift+s)");
       mesh.butt[8]->type(FL_TOGGLE_BUTTON);
       mesh.butt[8]->callback(mesh_options_ok_cb);
-
+      
       mesh.butt[9] = new Fl_Check_Button(L + 2 * WB, 2 * WB + 4 * BH,
                                          BW / 2 - WB, BH, "2D element faces");
       mesh.butt[9]->tooltip("(Alt+Shift+d)");

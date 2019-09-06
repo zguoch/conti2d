@@ -5505,7 +5505,7 @@ double opt_mesh_surfaces_edges(OPT_ARGS_NUM)
   if(action & GMSH_SET) {
     if(CTX::instance()->mesh.surfacesEdges != val)
       CTX::instance()->mesh.changed |= ENT_SURFACE;
-    CTX::instance()->mesh.surfacesEdges = (int)val;
+    CTX::instance()->mesh.surfacesEdges = (int)FlGui::instance()->options->mesh.butt[8]->value();//(int)val;//取消默认选中
   }
 #if defined(HAVE_FLTK)
   if(FlGui::available() && (action & GMSH_GUI))
