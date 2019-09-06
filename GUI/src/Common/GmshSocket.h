@@ -395,7 +395,7 @@ class GmshServer : public GmshSocket{
       addr_in.sin_family = AF_INET;
       addr_in.sin_addr.s_addr = INADDR_ANY;
       addr_in.sin_port = htons(_portno); // random assign if _portno == 0
-      if(bind(tmpsock, (struct sockaddr *)&addr_in, sizeof(addr_in)) < 0){
+      if(::bind(tmpsock, (struct sockaddr *)&addr_in, sizeof(addr_in)) < 0){
         CloseSocket(tmpsock);
         throw "Couldn't bind socket to name";
       }

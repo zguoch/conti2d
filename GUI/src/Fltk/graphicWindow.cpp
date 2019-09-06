@@ -910,7 +910,7 @@ static void file_open_grd(Fl_Widget * w, void *data)
     OpenProject(fileName);
     drawContext::global()->draw();
   }
-//弹出对话框
+
   static void add_new_point_based_entity(const std::string &what, int pane)
   {
     opt_general_axes(0, GMSH_SET | GMSH_GUI, 3);
