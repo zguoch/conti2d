@@ -29,6 +29,11 @@
 #define FMT_VTK 14
 #define FMT_XYZ 15
 
+#define UWC_P2P 0
+#define UWC_P2S 1
+#define DWC_P2P 2
+#define DWC_S2P 3
+
 // constants definition
 #define PI 3.141592653
 

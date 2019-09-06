@@ -610,6 +610,8 @@ FlGui::FlGui(int argc, char **argv)
   manip = new manipWindow(CTX::instance()->deltaFontSize);
   elementaryContext =
     new elementaryContextWindow(CTX::instance()->deltaFontSize);
+  continuationContext =
+    new continuationContextWindow(CTX::instance()->deltaFontSize);
   transformContext = new transformContextWindow(CTX::instance()->deltaFontSize);
   physicalContext = new physicalContextWindow(CTX::instance()->deltaFontSize);
   meshContext = new meshContextWindow(CTX::instance()->deltaFontSize);

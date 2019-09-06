@@ -34,6 +34,7 @@ class highOrderToolsWindow;
 class clippingWindow;
 class manipWindow;
 class elementaryContextWindow;
+class continuationContextWindow;
 class transformContextWindow;
 class physicalContextWindow;
 class meshContextWindow;
@@ -81,6 +82,7 @@ public:
   clippingWindow *clipping;
   manipWindow *manip;
   elementaryContextWindow *elementaryContext;
+  continuationContextWindow *continuationContext;
   transformContextWindow *transformContext;
   physicalContextWindow *physicalContext;
   meshContextWindow *meshContext;

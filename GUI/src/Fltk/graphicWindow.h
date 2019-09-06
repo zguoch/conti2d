@@ -18,7 +18,8 @@
 #include <FL/Fl_Sys_Menu_Bar.H>
 #endif
 #include <FL/Fl_Menu_Bar.H>
-
+// add continuation head file
+#include "Continuation.h"
 class openglWindow;
 class onelabGroup;
 class messageBrowser;
@@ -114,4 +115,5 @@ void show_hide_message_cb(Fl_Widget *w, void *data);
 void show_hide_menu_cb(Fl_Widget *w, void *data);
 void attach_detach_menu_cb(Fl_Widget *w, void *data);
 
+void run_UWC_p2p(string inputfile,double h1, double h2);
 #endif

@@ -8,12 +8,32 @@
 
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Float_Input.h>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Tabs.H>
+#include "fileDialogs.h"
+#include "GmshMessage.h"
+#include "graphicWindow.h"
+class continuationContextWindow {
+public:
+  Fl_Window *win;
+  Fl_Tabs *tab1; //, *tab2;
+  Fl_Input *input[80];
+  Fl_Value_Input *value[10];
+  Fl_Group *group[20];
+  Fl_Check_Button *butt[3];
+
+public:
+  continuationContextWindow(int deltaFontSize = 0);
+  void show(int pane);
+  void hide() { win->hide(); }
+  void updatePoint(double pt[3], int which);
+  bool frozenPointCoord(int coord);
+};
 
 class elementaryContextWindow {
 public:

@@ -61,8 +61,7 @@ typedef unsigned long intptr_t;
 #include "onelabUtils.h"
 #include "gmshCrossFields.h"
 
-// add continuation head file
-#include "Continuation.h"
+
 
 #if defined(HAVE_3M)
 #include "3M.h"
@@ -74,11 +73,28 @@ typedef unsigned long intptr_t;
 //==========continuation subfunctions=====================================
 void UpwardContinuation_P2P(Fl_Widget *w, void *data)
 {
-  Msg::Info("延拓");
+  Msg::Info("平面对平面向上延拓");
   // Continuation(GModel::current());
-  
+  FlGui::instance()->continuationContext->show(UWC_P2P);
   }
-
+void UpwardContinuation_P2S(Fl_Widget *w, void *data)
+{
+  // Msg::Info("平面对平面向上延拓");
+  // Continuation(GModel::current());
+  FlGui::instance()->continuationContext->show(UWC_P2S);
+  }
+  void DownwardContinuation_P2P(Fl_Widget *w, void *data)
+{
+  // Msg::Info("平面对平面向上延拓");
+  // Continuation(GModel::current());
+  FlGui::instance()->continuationContext->show(DWC_P2P);
+  }
+  void DownwardContinuation_S2P(Fl_Widget *w, void *data)
+{
+  // Msg::Info("平面对平面向上延拓");
+  // Continuation(GModel::current());
+  FlGui::instance()->continuationContext->show(DWC_S2P);
+  }
 //--the above is the user defined continuation subfunction---------------------------
     static void
     file_new_cb(Fl_Widget * w, void *data)
@@ -163,12 +179,18 @@ static const char *input_formats_conti2d =
     "Grid - Surfer 6" TT "*.grd" NN;
     // "Grid - XYZ" TT "*.xyz" NN;
 
+void run_UWC_p2p(string inputfile,double h1, double h2)
+{
+  std::cout<<inputfile<<std::endl;
+  Msg::Info("UWC_P2P: %s, %f, %f",inputfile.c_str(),h1,h2);
+}
 // open file for continuation
 static void file_open_grd(Fl_Widget * w, void *data)
   {
     if(!data) return;
     std::string mode((char *)data);
     int n = PView::list.size();
+    std::cout<<input_formats_conti2d<<std::endl;
     int f = fileChooser(FILE_CHOOSER_MULTI, (mode == "open") ? "Open" : "Merge",
                         input_formats_conti2d);
     //only process the first file, the only file is supported
@@ -801,7 +823,7 @@ static void file_open_grd(Fl_Widget * w, void *data)
     OpenProject(fileName);
     drawContext::global()->draw();
   }
-
+//弹出对话框
   static void add_new_point_based_entity(const std::string &what, int pane)
   {
     opt_general_axes(0, GMSH_SET | GMSH_GUI, 3);
@@ -4639,7 +4661,14 @@ static void file_open_grd(Fl_Widget * w, void *data)
     {"0Modules/Mesh/Save",
      (Fl_Callback *)mesh_save_cb} ,*/
     {"0Modules/Continuation/Upward/Plane to Plane",
-     (Fl_Callback *)UpwardContinuation_P2P}};
+     (Fl_Callback *)UpwardContinuation_P2P},
+     {"0Modules/Continuation/Upward/Plane to Surface",
+     (Fl_Callback *)UpwardContinuation_P2S},
+     {"0Modules/Continuation/Downward/Plane to Plane",
+     (Fl_Callback *)DownwardContinuation_P2P},
+     {"0Modules/Continuation/Downward/Surface to Plane",
+     (Fl_Callback *)DownwardContinuation_S2P},
+     };
 
   void onelabGroup::_addGmshMenus()
   {

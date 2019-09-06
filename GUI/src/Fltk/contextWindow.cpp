@@ -658,6 +658,243 @@ static void elementary_snap_cb(Fl_Widget *w, void *data)
     FlGui::instance()->elementaryContext->value[2]->value();
 }
 
+
+//static function for continuation
+static void field_select_grd_cb(Fl_Widget *w, void *data)
+{
+  Fl_Input *input = (Fl_Input *)data;
+  static const char *input_formats_conti2d ="Grid - Surfer 6" "\t" "*.grd" "\n";
+
+  int ret = fileChooser(FILE_CHOOSER_SINGLE, "Choose Surfer 6 Grd File", input_formats_conti2d);
+  if(ret) {
+    input->value(fileChooserGetName(1).c_str());
+    input->set_changed();
+    input->tooltip(input->value());
+  }
+}
+static void UWC_p2p(Fl_Widget *w, void *data)
+{
+  string inputfile(FlGui::instance()->continuationContext->input[1]->value());
+  double h1=atof(FlGui::instance()->continuationContext->input[0]->value());
+  double h2=atof(FlGui::instance()->continuationContext->input[2]->value());
+  Msg::Warning("执行平面到平面上延: %s, %f, %f",inputfile.c_str(),h1,h2);
+  
+}
+static void UWC_p2s(Fl_Widget *w, void *data)
+{
+  string inputfile(FlGui::instance()->continuationContext->input[4]->value());
+  double h1=atof(FlGui::instance()->continuationContext->input[3]->value());
+  string topofile(FlGui::instance()->continuationContext->input[5]->value());
+  Msg::Warning("执行平面到曲面上延: %s, %f, %s",inputfile.c_str(),h1,topofile.c_str());
+  
+}
+static void DWC_p2p(Fl_Widget *w, void *data)
+{
+  string inputfile(FlGui::instance()->continuationContext->input[7]->value());
+  double h1=atof(FlGui::instance()->continuationContext->input[6]->value());
+  double h2=atof(FlGui::instance()->continuationContext->input[8]->value());
+  Msg::Warning("执行平面到平面下延: %s, %f, %f",inputfile.c_str(),h1,h2);
+  
+}
+static void DWC_s2p(Fl_Widget *w, void *data)
+{
+  string inputfile(FlGui::instance()->continuationContext->input[9]->value());
+  string topofile(FlGui::instance()->continuationContext->input[10]->value());
+  double h2=atof(FlGui::instance()->continuationContext->input[11]->value());
+  Msg::Warning("执行平面到平面下延: %s, %s, %f",inputfile.c_str(),topofile.c_str(),h2);
+  
+}
+continuationContextWindow::continuationContextWindow(int deltaFontSize)
+{
+  FL_NORMAL_SIZE -= deltaFontSize;
+
+  int width = 34 * FL_NORMAL_SIZE;
+  int height = 5 * WB + 10 * BH;
+
+  win = new paletteWindow(width, height,
+                          CTX::instance()->nonModalWindows ? true : false,
+                          "Continuation Parameters Context");
+  win->box(GMSH_WINDOW_BOX);
+  {
+    tab1 = new Fl_Tabs(WB, WB, width - 2 * WB, height - 3 * WB - BH);
+    // 0: UWC_p2p
+    {
+      group[0] = new Fl_Group(WB, WB + BH, width - 2 * WB,height - 3 * WB - 2 * BH, "UWC_p2p");
+      group[0]->tooltip("Upward continuation from plane to plane");
+      //1. elevation 1
+      input[0] = new Fl_Float_Input(2 * WB, 2 * WB + 1 * BH, IW, BH, "Elevation of The Observation Field");
+      input[0]->value("0");
+      input[0]->tooltip("Elevation of the observation field");
+      //2. file chose
+      input[1] = new Fl_Input(2 * WB, 2 * WB + 2 * BH, IW, BH, "");
+      input[1]->tooltip("Click the right button to choose the observation field data");
+      Fl_Button *b1 = new Fl_Button(IW+2 * WB, 2 * WB + 2 * BH, BB, BH, "Field");
+      b1->tooltip("Click to read observation field grid data");
+      b1->callback(field_select_grd_cb, input[1]);
+      //3. elevation 2
+      input[2] = new Fl_Float_Input(2 * WB, 2 * WB + 3 * BH, IW, BH, "Elevation of The Continuation Field");
+      input[2]->value("0");
+      input[2]->tooltip("Elevation of the continuation field");
+
+      for(int i = 0; i < 3; i++) {
+        input[i]->align(FL_ALIGN_RIGHT);
+      }
+      {
+        Fl_Button *o = new Fl_Button(width - BB - 2 * WB,
+                                     height - 3 * WB - 2 * BH, BB, BH, "Run");
+        o->callback(UWC_p2p);
+      }
+      group[0]->end();
+    }
+    // 1: UWC_P2S
+    {
+      group[1] = new Fl_Group(WB, WB + BH, width - 2 * WB,height - 3 * WB - 2 * BH, "UWC_p2s");
+      group[1]->tooltip("Upward continuation from plane to surface");
+      //1. elevation 1
+      input[3] = new Fl_Float_Input(2 * WB, 2 * WB + 1 * BH, IW, BH, "Elevation of The Observation Field");
+      input[3]->value("0");
+      input[3]->tooltip("Elevation of the observation field");
+      //2. file chose
+      input[4] = new Fl_Input(2 * WB, 2 * WB + 2 * BH, IW, BH, "");
+      input[4]->tooltip("Click the right button to choose the observation field data");
+      Fl_Button *b1 = new Fl_Button(IW+2 * WB, 2 * WB + 2 * BH, BB, BH, "Field");
+      b1->tooltip("Click to read observation field grid data");
+      b1->callback(field_select_grd_cb, input[4]);
+      //3. elevation 2
+      input[5] = new Fl_Input(2 * WB, 2 * WB + 3 * BH, IW, BH, "");
+      input[5]->tooltip("Click the right button to choose the topography file");
+      Fl_Button *b2 = new Fl_Button(IW+2 * WB, 2 * WB + 3 * BH, BB, BH, "Topography");
+      b2->tooltip("Click to read topography of continued surface");
+      b2->callback(field_select_grd_cb, input[5]);
+
+      for(int i = 3; i < 6; i++) {
+        input[i]->align(FL_ALIGN_RIGHT);
+      }
+      {
+        Fl_Button *o = new Fl_Button(width - BB - 2 * WB,
+                                     height - 3 * WB - 2 * BH, BB, BH, "Run");
+        o->callback(UWC_p2s);
+      }
+      group[1]->end();
+    }
+    // 2: DWC_P2P
+    {
+      group[2] = new Fl_Group(WB, WB + BH, width - 2 * WB,
+                              height - 3 * WB - 2 * BH, "DWC_p2p");
+      group[2]->tooltip("Downward continuation from plane to plane");
+      //1. elevation 1
+      input[6] = new Fl_Float_Input(2 * WB, 2 * WB + 1 * BH, IW, BH, "Elevation of The Observation Field");
+      input[6]->value("0");
+      input[6]->tooltip("Elevation of the observation field");
+      //2. file chose
+      input[7] = new Fl_Input(2 * WB, 2 * WB + 2 * BH, IW, BH, "");
+      input[7]->tooltip("Click the right button to choose the observation field data");
+      Fl_Button *b1 = new Fl_Button(IW+2 * WB, 2 * WB + 2 * BH, BB, BH, "Field");
+      b1->tooltip("Click to read observation field grid data");
+      b1->callback(field_select_grd_cb, input[7]);
+      //3. elevation 2
+      input[8] = new Fl_Float_Input(2 * WB, 2 * WB + 3 * BH, IW, BH, "Elevation of The Continuation Field");
+      input[8]->value("0");
+      input[8]->tooltip("Elevation of the continuation field");
+
+      for(int i = 6; i < 9; i++) {
+        input[i]->align(FL_ALIGN_RIGHT);
+      }
+      {
+        Fl_Button *o = new Fl_Button(width - BB - 2 * WB,
+                                     height - 3 * WB - 2 * BH, BB, BH, "Run");
+        o->callback(DWC_p2p);
+      }
+      group[2]->end();
+    }
+    // 3: DWC_S2P
+    {
+      group[3] = new Fl_Group(WB, WB + BH, width - 2 * WB,
+                              height - 3 * WB - 2 * BH, "DWC_S2P");
+      group[3]->tooltip("Downward continuation from surface to plane");
+      //1. file chose
+      input[9] = new Fl_Input(2 * WB, 2 * WB + 1 * BH, IW, BH, "");
+      input[9]->tooltip("Click the right button to choose the observation field data");
+      Fl_Button *b1 = new Fl_Button(IW+2 * WB, 2 * WB + 1 * BH, BB, BH, "Field");
+      b1->tooltip("Click to read observation field grid data");
+      b1->callback(field_select_grd_cb, input[9]);
+      //2. elevation 2
+      input[10] = new Fl_Input(2 * WB, 2 * WB + 2 * BH, IW, BH, "");
+      input[10]->tooltip("Click the right button to choose the topography");
+      Fl_Button *b2 = new Fl_Button(IW+2 * WB, 2 * WB + 2 * BH, BB, BH, "Topography");
+      b2->tooltip("Click to read topography of observation surface");
+      b2->callback(field_select_grd_cb, input[10]);
+      //3. elevation 1
+      input[11] = new Fl_Float_Input(2 * WB, 2 * WB + 3 * BH, IW, BH, "Elevation of The Continuation Field");
+      input[11]->value("0");
+      input[11]->tooltip("Elevation of the Continuation Field");
+      for(int i = 9; i < 12; i++) {
+        input[i]->align(FL_ALIGN_RIGHT);
+      }
+      {
+        Fl_Button *o = new Fl_Button(width - BB - 2 * WB,
+                                     height - 3 * WB - 2 * BH, BB, BH, "Run");
+        o->callback(DWC_s2p);
+      }
+      group[3]->end();
+    }
+    tab1->end();
+  }
+  // {
+  //   Fl_Button *o = new Fl_Button(width - 4 * WB, WB, 3 * WB, 3 * WB, "...");
+  //   o->callback(elementary_switch_tabs_cb);
+  // }
+  
+  tab1->show();
+
+  win->position(CTX::instance()->ctxPosition[0],
+                CTX::instance()->ctxPosition[1]);
+  win->end();
+
+  FL_NORMAL_SIZE += deltaFontSize;
+}
+
+bool continuationContextWindow::frozenPointCoord(int coord)
+{
+  if(coord < 0 || coord > 2) return false;
+  return butt[coord]->value() ? true : false;
+}
+
+void continuationContextWindow::updatePoint(double pt[3], int which)
+{
+  for(int i = 0; i < 3; i++) {
+    if(!frozenPointCoord(i)) {
+      char str[32];
+      sprintf(str, "%g", pt[i]);
+      if(which == 1) {
+        int start[11] = {4, 8, 14, 21, 26, 32, 39, 47, 53, 59, 68};
+        for(int k = 0; k < 11; k++) {
+          input[start[k] + i]->value(str);
+          if(input[start[k] + i]->parent()->active()) {
+            input[start[k] + i]->do_callback(0, (void *)"no_redraw");
+          }
+        }
+      }
+    }
+  }
+}
+
+void continuationContextWindow::show(int pane)
+{
+  if(pane < 0 || pane > 3) return;
+
+  for(int i = 0; i < 4; i++) {
+    group[i]->hide();
+    group[i]->deactivate();
+  }
+
+  tab1->show();
+
+  group[pane]->show();
+  group[pane]->activate();
+  win->show();
+}
+
 elementaryContextWindow::elementaryContextWindow(int deltaFontSize)
 {
   FL_NORMAL_SIZE -= deltaFontSize;
