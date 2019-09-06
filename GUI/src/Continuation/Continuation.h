@@ -34,6 +34,11 @@
 #define DWC_P2P 2
 #define DWC_S2P 3
 
+#define DWC_CGLS 1
+#define DWC_TIKHONOV 2
+#define DWC_INTEGRALITERATION 3
+#define DWC_LANDWEBER 4
+
 // constants definition
 #define PI 3.141592653
 
@@ -67,23 +72,31 @@ public:
     bool SaveGrd(string filename, GrdHead grdhead,double* data,int extNum, bool savexxyz=false,bool isInfo=true);
     int SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z=0);
     bool SaveGrd2xyz(string filename, GrdHead grdhead, double* data,int extNum,bool isInfo=true);
+    int SaveGrd2VTK_topo(string outputfile,GrdHead grdhead,double* data,double* topo);
     string Grid2Gmsh(string FileName,string Name_data="Original Field");//surfer grid file to gmsh 
     int WriteGmsh();
     int CheckOpts();
     int update();
-    string UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread);
+    void UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread);
+    void UWC_p2s(string inputfilename,string outputfilename,double height1,string topoFile, int extNum, int num_thread);
+    void DWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,double DWC_parameter,int DWC_method, int num_thread);
+    void DWC_s2p_LandweberIter(double** G,double* x, double* b,GrdHead grdhead,int extNum,int num_thread,string outputfile,double iter_number);
+    void DWC_s2p(string inputfilename,string outputfilename,string topo1,double height2,int extNum,double DWC_parameter,int DWC_method, int num_thread);
+
     //kernel
     //Equation 4
     void GetPmnij(double* Pmnij,int rows,int cols,double dx,double dy,double rph,double xm,double ym);
     int Getkernel_p2p_new(GrdHead grdhead, double rph, double* kernel_firstRow, int num_thread);
     int Getkernel_p2p_new(GrdHead grdhead, double rph, double** kernel, int num_thread);
+    int Getkernel_p2s_new(GrdHead grdhead, double h1,double* topo2, double** kernel, int num_thread);
     // calculate upward continuation: b=Gx
     void UWC_Gij(double* b, double* G,double* x, GrdHead grdhead, int num_thread=1);
     //calculate upward continuation: b=Gx
     void UWC_Gij(double* b,double** G,double* x, int modelnum,int num_thread=1);
     // Get i row j column element of kernel matrix
     double GetGij(const int i, const int j, double* firstRow, const GrdHead grdhead);
-
+    double Norm2(double* x,const int num);
+    double Norm2_Gradient(double* result,GrdHead grdhead);
 public: /*public data*/
     cTriMesh m_triMESH;
     string m_InputFile;

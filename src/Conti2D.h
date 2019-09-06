@@ -34,7 +34,7 @@ void DWC_s2p(string inputfilename,string outputfilename,string topo1,double heig
 
 // Get i row j column element of kernel matrix
 double GetGij(const int i, const int j, double* firstRow, const GrdHead grdhead);
-
+ 
 // Get first row of new kernal matrix 
 int Getkernel_p2p_new(GrdHead grdhead, double rph, double* kernel_firstRow, int num_thread);
 

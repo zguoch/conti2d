@@ -677,7 +677,7 @@ static void UWC_p2p(Fl_Widget *w, void *data)
   string inputfile(FlGui::instance()->continuationContext->input[1]->value());
   double h1=atof(FlGui::instance()->continuationContext->input[0]->value());
   double h2=atof(FlGui::instance()->continuationContext->input[2]->value());
-  Msg::Warning("执行平面到平面上延: %s, %f, %f",inputfile.c_str(),h1,h2);
+  run_UWC_p2p(inputfile,h1,h2);
   
 }
 static void UWC_p2s(Fl_Widget *w, void *data)
@@ -685,24 +685,21 @@ static void UWC_p2s(Fl_Widget *w, void *data)
   string inputfile(FlGui::instance()->continuationContext->input[4]->value());
   double h1=atof(FlGui::instance()->continuationContext->input[3]->value());
   string topofile(FlGui::instance()->continuationContext->input[5]->value());
-  Msg::Warning("执行平面到曲面上延: %s, %f, %s",inputfile.c_str(),h1,topofile.c_str());
-  
+  run_UWC_p2s(inputfile,h1,topofile);
 }
 static void DWC_p2p(Fl_Widget *w, void *data)
 {
   string inputfile(FlGui::instance()->continuationContext->input[7]->value());
   double h1=atof(FlGui::instance()->continuationContext->input[6]->value());
   double h2=atof(FlGui::instance()->continuationContext->input[8]->value());
-  Msg::Warning("执行平面到平面下延: %s, %f, %f",inputfile.c_str(),h1,h2);
-  
+  run_DWC_p2p(inputfile,h1,h2);
 }
 static void DWC_s2p(Fl_Widget *w, void *data)
 {
   string inputfile(FlGui::instance()->continuationContext->input[9]->value());
   string topofile(FlGui::instance()->continuationContext->input[10]->value());
   double h2=atof(FlGui::instance()->continuationContext->input[11]->value());
-  Msg::Warning("执行平面到平面下延: %s, %s, %f",inputfile.c_str(),topofile.c_str(),h2);
-  
+  run_DWC_s2p(inputfile,topofile,h2);
 }
 continuationContextWindow::continuationContextWindow(int deltaFontSize)
 {

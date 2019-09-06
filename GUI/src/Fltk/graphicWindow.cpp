@@ -73,28 +73,20 @@ typedef unsigned long intptr_t;
 //==========continuation subfunctions=====================================
 void UpwardContinuation_P2P(Fl_Widget *w, void *data)
 {
-  Msg::Info("平面对平面向上延拓");
-  // Continuation(GModel::current());
   FlGui::instance()->continuationContext->show(UWC_P2P);
-  }
+}
 void UpwardContinuation_P2S(Fl_Widget *w, void *data)
 {
-  // Msg::Info("平面对平面向上延拓");
-  // Continuation(GModel::current());
   FlGui::instance()->continuationContext->show(UWC_P2S);
-  }
-  void DownwardContinuation_P2P(Fl_Widget *w, void *data)
+}
+void DownwardContinuation_P2P(Fl_Widget *w, void *data)
 {
-  // Msg::Info("平面对平面向上延拓");
-  // Continuation(GModel::current());
   FlGui::instance()->continuationContext->show(DWC_P2P);
-  }
-  void DownwardContinuation_S2P(Fl_Widget *w, void *data)
+}
+void DownwardContinuation_S2P(Fl_Widget *w, void *data)
 {
-  // Msg::Info("平面对平面向上延拓");
-  // Continuation(GModel::current());
   FlGui::instance()->continuationContext->show(DWC_S2P);
-  }
+}
 //--the above is the user defined continuation subfunction---------------------------
     static void
     file_new_cb(Fl_Widget * w, void *data)
@@ -179,10 +171,124 @@ static const char *input_formats_conti2d =
     "Grid - Surfer 6" TT "*.grd" NN;
     // "Grid - XYZ" TT "*.xyz" NN;
 
-void run_UWC_p2p(string inputfile,double h1, double h2)
+static void showgrd(string grdfile,string name_data="Grid Data")
 {
-  std::cout<<inputfile<<std::endl;
-  Msg::Info("UWC_P2P: %s, %f, %f",inputfile.c_str(),h1,h2);
+  cContinuation conti;
+  conti.m_InputFile=grdfile;
+  string gmshfile=conti.Grid2Gmsh(conti.m_InputFile,name_data); //transform grid file to gmsh
+  OpenProject(gmshfile);
+  drawContext::global()->draw();
+}
+
+void run_UWC_p2p(string inputfile,double height_in, double height_out)
+{
+  Msg::Info("Calculating upward continuation from plane to plane");
+  Msg::Info("The observation field data file: %s",inputfile.c_str());
+  Msg::Info("Elevation of the observation plane: %f m",height_in);
+  Msg::Info("Elevation of the continuation plane: %f m",height_out);
+  cContinuation conti;
+  string filename_input=conti.getFileName(inputfile);
+  string outputfile=filename_input+"_uwc_p2p.grd";
+  if(inputfile!="")
+  {
+    int max_threads=omp_get_max_threads();
+    int num_thread=(max_threads>1?max_threads:1);
+    Msg::Info("All the %d threads are used",num_thread);
+    conti.UWC_p2p(inputfile,outputfile,height_in,height_out,0,num_thread);
+    string name_field_conti;
+    string str_height_in, str_height_out;
+    stringstream ss,ss2;
+    ss<<height_in; ss>>str_height_in;
+    ss2<<height_out; ss2>>str_height_out;
+    name_field_conti="UWC_"+str_height_in+"_"+str_height_out;
+    showgrd(outputfile,name_field_conti);
+  }else
+  {
+    Msg::Error("Input file name is empty: %s",inputfile.c_str());
+    return;
+  }
+}
+void run_UWC_p2s(string inputfile,double height_in, string topofile)
+{
+  Msg::Info("Calculating upward continuation from plane to surface");
+  Msg::Info("The observation field data file: %s",inputfile.c_str());
+  Msg::Info("Elevation of the observation plane: %f m",height_in);
+  Msg::Info("Topography data file of the continuation surface: %s",topofile.c_str());
+  cContinuation conti;
+  string filename_input=conti.getFileName(inputfile);
+  string outputfile=filename_input+"_uwc_p2s.grd";
+  if(inputfile!="")
+  {
+    int max_threads=omp_get_max_threads();
+    int num_thread=(max_threads>1?max_threads:1);
+    Msg::Info("All the %d threads are used",num_thread);
+    conti.UWC_p2s(inputfile,outputfile,height_in,topofile,0,num_thread);
+    string name_field_conti;
+    string str_height_in, str_height_out;
+    name_field_conti="UWC_p2s";
+    showgrd(outputfile,name_field_conti);
+  }else
+  {
+    Msg::Error("Input file name is empty: %s",inputfile.c_str());
+    return;
+  }
+}
+void run_DWC_p2p(string inputfile,double height_in, double height_out)
+{
+  Msg::Info("Calculating downward continuation from plane to plane");
+  Msg::Info("The observation field data file: %s",inputfile.c_str());
+  Msg::Info("Elevation of the observation plane: %f m",height_in);
+  Msg::Info("Elevation of the continuation plane: %f m",height_out);
+  cContinuation conti;
+  string filename_input=conti.getFileName(inputfile);
+  string outputfile=filename_input+"_dwc_p2p.grd";
+  if(inputfile!="")
+  {
+    int max_threads=omp_get_max_threads();
+    int num_thread=(max_threads>1?max_threads:1);
+    Msg::Info("All the %d threads are used",num_thread);
+    int num_ext=0;
+    conti.DWC_p2p(inputfile,outputfile,height_in,height_out,num_ext,100,DWC_LANDWEBER,num_thread);
+    string name_field_conti;
+    string str_height_in, str_height_out;
+    stringstream ss,ss2;
+    ss<<height_in; ss>>str_height_in;
+    ss2<<height_out; ss2>>str_height_out;
+    name_field_conti="DWC_"+str_height_in+"_"+str_height_out;
+    showgrd(outputfile,name_field_conti);
+  }else
+  {
+    Msg::Error("Input file name is empty: %s",inputfile.c_str());
+    return;
+  }
+}
+void run_DWC_s2p(string inputfile,string topofile, double height_out)
+{
+  Msg::Info("Calculating downward continuation from surface to plane");
+  Msg::Info("The observation field data file: %s",inputfile.c_str());
+  Msg::Info("Topography of the observation surface: %s",topofile.c_str());
+  Msg::Info("Elevation of the continuation plane: %f m",height_out);
+  cContinuation conti;
+  string filename_input=conti.getFileName(inputfile);
+  string outputfile=filename_input+"_dwc_s2p.grd";
+  if(inputfile!="")
+  {
+    int max_threads=omp_get_max_threads();
+    int num_thread=(max_threads>1?max_threads:1);
+    Msg::Info("All the %d threads are used",num_thread);
+    int num_ext=0;
+    conti.DWC_s2p(inputfile,outputfile,topofile,height_out,num_ext,100,DWC_LANDWEBER,num_thread);
+    string name_field_conti;
+    string str_height_out;
+    stringstream ss2;
+    ss2<<height_out; ss2>>str_height_out;
+    name_field_conti="DWC_s_"+str_height_out;
+    showgrd(outputfile,name_field_conti);
+  }else
+  {
+    Msg::Error("Input file name is empty: %s",inputfile.c_str());
+    return;
+  }
 }
 // open file for continuation
 static void file_open_grd(Fl_Widget * w, void *data)
@@ -191,38 +297,19 @@ static void file_open_grd(Fl_Widget * w, void *data)
     std::string mode((char *)data);
     int n = PView::list.size();
     std::cout<<input_formats_conti2d<<std::endl;
-    int f = fileChooser(FILE_CHOOSER_MULTI, (mode == "open") ? "Open" : "Merge",
+    int f = fileChooser(FILE_CHOOSER_SINGLE, (mode == "open") ? "Open" : "Merge",
                         input_formats_conti2d);
-    //only process the first file, the only file is supported
     if(f) {
-      if(f>1)
-      {
-        Msg::Warning("You choose more than one files, conti2d only process the first one: %s",fileChooserGetName(1).c_str());
-      }
       if(mode == "open")
         {
-          //first open grd file, then transfrom to gmsh to display
-          cContinuation conti;
-          conti.m_InputFile=fileChooserGetName(1);
-          string gmshfile=conti.Grid2Gmsh(conti.m_InputFile); //transform grid file to gmsh
-          OpenProject(gmshfile);
-          GModel::current()->getFileName();
-          conti.UWC_p2p(conti.m_InputFile,"uwc.vtk",0,5,0,5);
+          showgrd(fileChooserGetName(1));
         }
         else
-          // MergeFile(fileChooserGetName(i));
-          Msg::Error("The model of file_open_grd is not Open: %s",mode.c_str());
-      // if(n != (int)PView::list.size())
-      //   FlGui::instance()->openModule("Post-processing");
-      // if(CTX::instance()->launchSolverAtStartup >= 0)
-      //   solver_cb(0, (void *)(intptr_t)CTX::instance()->launchSolverAtStartup);
-      // else if(onelabUtils::haveSolverToRun())
-      //   onelab_cb(0, (void *)"check");
+        {
+            Msg::Error("The model of file_open_grd is not Open: %s",mode.c_str());
+        }
       drawContext::global()->draw();
-
-      
     }
-
   }
   static void file_open_merge_cb(Fl_Widget * w, void *data)
   {
@@ -2759,8 +2846,8 @@ static void file_open_grd(Fl_Widget * w, void *data)
     {"Sa&ve Mesh", FL_CTRL + FL_SHIFT + 's', (Fl_Callback *)mesh_save_cb, 0},
     // {"Save Model Options", FL_CTRL + 'j', (Fl_Callback *)file_options_save_cb,
     //  (void *)"file"},
-    // {"Save Options As Default", FL_CTRL + FL_SHIFT + 'j',
-    //  (Fl_Callback *)file_options_save_cb, (void *)"default", FL_MENU_DIVIDER},
+    {"Save Options As Default", FL_CTRL + FL_SHIFT + 'j',
+     (Fl_Callback *)file_options_save_cb, (void *)"default", FL_MENU_DIVIDER},
     {"&Export...", FL_CTRL + 'e', (Fl_Callback *)file_export_cb, 0,
      FL_MENU_DIVIDER},
     {"&Quit", FL_CTRL + 'q', (Fl_Callback *)file_quit_cb, 0},
