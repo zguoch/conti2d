@@ -117,6 +117,6 @@ void attach_detach_menu_cb(Fl_Widget *w, void *data);
 
 void run_UWC_p2p(string inputfile,double height_in, double height_out);
 void run_UWC_p2s(string inputfile,double height_in, string topofile);
-void run_DWC_p2p(string inputfile,double height_in, double height_out);
-void run_DWC_s2p(string inputfile,string topofile, double height_out);
+void run_DWC_p2p(string inputfile,double height_in, double height_out,double kmax);
+void run_DWC_s2p(string inputfile,string topofile, double height_out,double kmax);
 #endif

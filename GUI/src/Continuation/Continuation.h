@@ -73,11 +73,12 @@ public:
     int SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z=0);
     bool SaveGrd2xyz(string filename, GrdHead grdhead, double* data,int extNum,bool isInfo=true);
     int SaveGrd2VTK_topo(string outputfile,GrdHead grdhead,double* data,double* topo);
-    string Grid2Gmsh(string FileName,string Name_data="Original Field");//surfer grid file to gmsh 
+    string Grid2Gmsh_plane(string FileName,string Name_data="Original Field",double z0=0);//surfer grid file to gmsh
+    string Grid2Gmsh_surface(string FileName,string Name_data="Original Field",string Topography="");//surfer grid file to gmsh 
     int WriteGmsh();
     int CheckOpts();
     int update();
-    void UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread);
+    void UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread,bool show=true);
     void UWC_p2s(string inputfilename,string outputfilename,double height1,string topoFile, int extNum, int num_thread);
     void DWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,double DWC_parameter,int DWC_method, int num_thread);
     void DWC_s2p_LandweberIter(double** G,double* x, double* b,GrdHead grdhead,int extNum,int num_thread,string outputfile,double iter_number);

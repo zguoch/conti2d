@@ -243,9 +243,9 @@ int cContinuation::ReadXYZ(string FileName, cTriMesh& trimesh)
     return 0;
 }
 
-string cContinuation::Grid2Gmsh(string FileName,string Name_data)
+string cContinuation::Grid2Gmsh_plane(string FileName,string Name_data,double z0)
 {
-    string gmshfile=getFileName(FileName)+".gmsh";
+    string gmshfile=getFileName(FileName)+".msh";
     Msg::Info("Reading surfer grid file and display on GUI");
     ifstream fin;
     fin.open(FileName, ios::in);
@@ -307,7 +307,7 @@ string cContinuation::Grid2Gmsh(string FileName,string Name_data)
             fout<<j+i*nx+1<<" "
                 <<bounds[0]+dx*j<<" "
                 <<bounds[2]+dy*i<<" "
-                <<0<<endl;
+                <<z0<<endl;
         }
     }
     fout<<"$EndNodes"<<endl;
@@ -348,6 +348,170 @@ string cContinuation::Grid2Gmsh(string FileName,string Name_data)
     delete[]  data;
     return gmshfile;
 }
+
+string cContinuation::Grid2Gmsh_surface(string FileName,string Name_data,string Topography)
+{
+    string gmshfile=getFileName(FileName)+".msh";
+    Msg::Info("Reading surfer grid file and display on GUI");
+    //read field data
+    ifstream fin;
+    fin.open(FileName, ios::in);
+    if (!fin)
+    {
+        Msg::Error("Open file failed: %s",FileName.c_str());
+        return "";
+    }
+    string dsaa;
+    int nx,ny;
+    double bounds[6];
+    //read head
+    fin >> dsaa;
+    if(dsaa=="DSAA")
+    {
+        Msg::Info("The grd file in ASCII");
+    }else{
+        Msg::Error("Input grd file is Binary. Please convert it to ascii: https://convert.goldensoftware.com/Application/Conversion");
+        return "";
+    }
+    fin >> nx;
+    fin >> ny;
+
+    for (int i = 0; i < 6; i++)
+    {
+        fin >> bounds[i];
+    }
+    double dx=(bounds[1]-bounds[0])/(nx-1);
+    double dy=(bounds[3]-bounds[2])/(ny-1);
+    //read data
+    double* data = new double[nx*ny];
+    for (int i = 0; i < ny; i++)
+    {
+        for (int j = 0; j < nx; j++)
+        {
+            fin >> data[j+nx*i];
+        }
+    }
+    fin.close();
+    //2. read topography data
+    double* topo=NULL;
+    if(Topography!="")
+    {
+        ifstream fin_topo;
+        fin_topo.open(Topography, ios::in);
+        if (!fin_topo)
+        {
+            Msg::Error("Open file failed: %s",Topography.c_str());
+            return "";
+        }
+        //read head
+        fin_topo >> dsaa;
+        if(dsaa=="DSAA")
+        {
+            Msg::Info("The grd file in ASCII");
+        }else{
+            Msg::Error("Input grd file is Binary. Please convert it to ascii: https://convert.goldensoftware.com/Application/Conversion");
+            return "";
+        }
+        fin_topo >> nx;
+        fin_topo >> ny;
+
+        for (int i = 0; i < 6; i++)
+        {
+            fin_topo >> bounds[i];
+        }
+        //read data
+        topo = new double[nx*ny];
+        for (int i = 0; i < ny; i++)
+        {
+            for (int j = 0; j < nx; j++)
+            {
+                fin_topo >> topo[j+nx*i];
+            }
+        }
+        fin_topo.close();
+    }
+    //transform to gmsh
+    ofstream fout(gmshfile);
+    if (!fin)
+    {
+        Msg::Error("Open file failed: %s",FileName.c_str());
+        return "";
+    }else
+    {
+        Msg::Info("Save grd file to gmsh: %s",gmshfile.c_str());
+    }
+    fout<<"$MeshFormat"<<endl;
+    fout<<"2.2 0 8"<<endl;
+    fout<<"$EndMeshFormat"<<endl;
+    fout<<"$Nodes"<<endl;
+    fout<<nx*ny<<endl;
+    if(topo==NULL)
+    {
+        for(int i=0;i<ny;i++)
+        {
+            for(int j=0;j<nx;j++)
+            {
+                fout<<j+i*nx+1<<" "
+                    <<bounds[0]+dx*j<<" "
+                    <<bounds[2]+dy*i<<" "
+                    <<0<<endl;
+            }
+        }
+    }else
+    {
+        for(int i=0;i<ny;i++)
+        {
+            for(int j=0;j<nx;j++)
+            {
+                fout<<j+i*nx+1<<" "
+                    <<bounds[0]+dx*j<<" "
+                    <<bounds[2]+dy*i<<" "
+                    <<topo[j+i*nx]<<endl;
+            }
+        }
+    }
+    
+    
+    fout<<"$EndNodes"<<endl;
+    fout<<"$Elements"<<endl;
+    int nx_el=nx-1,ny_el=ny-1;
+    int nel=nx_el*ny_el;
+    fout<<nel<<endl;
+    for(int i=0;i<ny_el;i++)
+    {
+        for(int j=0;j<nx_el;j++)
+        {
+            int index_LL=j+i*nx+1;
+            int index_TL=j+(i+1)*nx+1;
+            fout<<j+i*nx_el+1<<" "
+                <<3<<" 2 1 1 "
+                <<index_LL<<" "
+                <<index_LL+1<<" "
+                <<index_TL+1<<" "
+                <<index_TL<<endl;
+        }
+    }
+    fout<<"$EndElements"<<endl;
+    //write data
+    fout<<"$NodeData"<<endl;
+    fout<<1<<endl;
+    fout<<"\""<<Name_data<<"\""<<endl;
+    fout<<"1 \n0 \n3 \n0 \n1"<<endl;
+    fout<<nx*ny<<endl;
+    for(int i=0;i<ny*nx;i++)
+    {
+        // for(int j=0;j<nx;j++)
+        {
+            fout<<i+1<<" "<<data[i]<<endl;
+        }
+    }
+    fout<<"$EndNodeData"<<endl;
+    fout.close();
+    delete[]  data;
+    if(topo!=NULL)delete[] topo;
+    return gmshfile;
+}
+
 int cContinuation::Info(string info, int level)
 {
     if(level==0)return 0;
@@ -571,7 +735,7 @@ double* cContinuation::ReadGrd(string filename, GrdHead& grdhead,int extNum)
     return data;
 }
 
-void cContinuation::UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread)
+void cContinuation::UWC_p2p(string inputfilename,string outputfilename,double height1,double height2,int extNum,int num_thread,bool show)
 {
     //1. read grd data
     GrdHead grdhead;
@@ -1115,10 +1279,16 @@ void cContinuation::DWC_s2p_LandweberIter(double** G,double* x, double* b,
     double* tempArray=new double[modelnum];
 
     string path_tempResult=getFileName(outputfile)+"_Landweber";
+    
     string command="mkdir "+path_tempResult;
     if(system(command.c_str()))
     {
-        command="rm "+path_tempResult+"/*.grd";
+        #if defined(WIN32)
+            command="del "+path_tempResult+"/*.grd";
+        #else
+            command="rm "+path_tempResult+"/*.grd";
+        #endif
+        
         if(!system(command.c_str()))
         {
             Msg::Info("Clean .grd files in temporary folder: %s",path_tempResult.c_str());
@@ -1155,7 +1325,8 @@ void cContinuation::DWC_s2p_LandweberIter(double** G,double* x, double* b,
         fout_log<<endl;
         //5. write temporary result
         // if (!SaveGrd(path_tempResult+"/"+std::to_string(k)+".grd", grdhead, x,extNum,false,false))return ;
-        SaveGrd2VTK(path_tempResult+"/result_"+std::to_string(k)+".vtk",grdhead,x);
+        // SaveGrd2VTK(path_tempResult+"/result_"+std::to_string(k)+".vtk",grdhead,x);
+        SaveGrd(path_tempResult+"/result_"+std::to_string(k)+".grd",grdhead,x,extNum);
         if(RE<REmin)break;
         //update progressbar
         Msg::StatusBar(true,"Landweber iteration progress: %d%%, RE: %.2E; Norm2: %.2E; Norm2_grad: %.2E",int((float(k)/kmax)*100),RE,norm2_x,norm2_gradient);

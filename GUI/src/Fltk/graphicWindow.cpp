@@ -88,42 +88,42 @@ void DownwardContinuation_S2P(Fl_Widget *w, void *data)
   FlGui::instance()->continuationContext->show(DWC_S2P);
 }
 //--the above is the user defined continuation subfunction---------------------------
-    static void
-    file_new_cb(Fl_Widget * w, void *data)
-  {
-  test:
-    if(fileChooser(FILE_CHOOSER_CREATE, "New", "")) {
-      std::string name = fileChooserGetName(1);
-      std::vector<std::string> split = SplitFileName(name);
-      if(split[2] != ".geo") {
-        if(fl_choice("File '%s' does not have the '.geo' extension.\n\n"
-                     "Do you want to continue as-is?",
-                     "Continue as-is", "Use '.geo' extension", 0, name.c_str()))
-          name = split[0] + split[1] + ".geo";
-      }
-      if(!StatFile(name)) {
-        if(fl_choice("File '%s' already exists.\n\nDo you want to delete it?",
-                     "Cancel", "Delete", 0, name.c_str()))
-          UnlinkFile(name);
-        else
-          goto test;
-      }
-      FILE *fp = Fopen(name.c_str(), "w");
-      if(!fp) {
-        Msg::Error("Unable to open file '%s'", name.c_str());
-        return;
-      }
-      int factory = fl_choice("Which geometry kernel do you want to use?",
-                              "Built-in", "OpenCASCADE", 0);
-      time_t now;
-      time(&now);
-      fprintf(fp, "// Gmsh project created on %s", ctime(&now));
-      if(factory) fprintf(fp, "SetFactory(\"OpenCASCADE\");\n");
-      fclose(fp);
-      OpenProject(name);
-      drawContext::global()->draw();
-    }
-  }
+  //   static void
+  //   file_new_cb(Fl_Widget * w, void *data)
+  // {
+  // test:
+  //   if(fileChooser(FILE_CHOOSER_CREATE, "New", "")) {
+  //     std::string name = fileChooserGetName(1);
+  //     std::vector<std::string> split = SplitFileName(name);
+  //     if(split[2] != ".geo") {
+  //       if(fl_choice("File '%s' does not have the '.geo' extension.\n\n"
+  //                    "Do you want to continue as-is?",
+  //                    "Continue as-is", "Use '.geo' extension", 0, name.c_str()))
+  //         name = split[0] + split[1] + ".geo";
+  //     }
+  //     if(!StatFile(name)) {
+  //       if(fl_choice("File '%s' already exists.\n\nDo you want to delete it?",
+  //                    "Cancel", "Delete", 0, name.c_str()))
+  //         UnlinkFile(name);
+  //       else
+  //         goto test;
+  //     }
+  //     FILE *fp = Fopen(name.c_str(), "w");
+  //     if(!fp) {
+  //       Msg::Error("Unable to open file '%s'", name.c_str());
+  //       return;
+  //     }
+  //     int factory = fl_choice("Which geometry kernel do you want to use?",
+  //                             "Built-in", "OpenCASCADE", 0);
+  //     time_t now;
+  //     time(&now);
+  //     fprintf(fp, "// Gmsh project created on %s", ctime(&now));
+  //     if(factory) fprintf(fp, "SetFactory(\"OpenCASCADE\");\n");
+  //     fclose(fp);
+  //     OpenProject(name);
+  //     drawContext::global()->draw();
+  //   }
+  // }
 
 #if defined(HAVE_NATIVE_FILE_CHOOSER)
 #define TT "\t"
@@ -133,53 +133,76 @@ void DownwardContinuation_S2P(Fl_Widget *w, void *data)
 #define NN ")\t"
 #endif
 
-  static const char *input_formats =
-    "All Files" TT "*.*" NN "Geometry - Gmsh GEO" TT "*.geo" NN
-#if defined(HAVE_ACIS)
-    "Geometry - ACIS" TT "*.sat" NN
-#endif
-#if defined(HAVE_OCC)
-    "Geometry - OpenCASCADE BRep" TT "*.brep" NN
-    "Geometry - OpenCASCADE IGES" TT "*.{igs,iges}" NN
-    "Geometry - OpenCASCADE STEP" TT "*.{stp,step}" NN
-#endif
-    "Mesh - Gmsh MSH" TT "*.msh" NN "Mesh - Diffpack 3D" TT "*.diff" NN
-    "Mesh - I-deas Universal" TT "*.unv" NN
-#if defined(HAVE_MED)
-    "Mesh - MED" TT "*.{med,mmed}" NN
-#endif
-    "Mesh - INRIA Medit" TT "*.mesh" NN "Mesh - Nastran Bulk Data File" TT
-    "*.{bdf,nas}" NN "Mesh - Plot3D Structured Mesh" TT "*.p3d" NN
-    "Mesh - STL Surface" TT "*.stl" NN "Mesh - VTK" TT "*.vtk" NN
-    "Mesh - VRML Surface" TT "*.{wrl,vrml}" NN "Mesh - PLY2 Surface" TT
-    "*.ply2" NN "Post-processing - Gmsh POS" TT "*.pos" NN
-#if defined(HAVE_MED)
-    "Post-processing - MED" TT "*.rmed" NN
-#endif
-    "Image - BMP" TT "*.bmp" NN
-#if defined(HAVE_LIBJPEG)
-    "Image - JPEG" TT "*.{jpg,jpeg}" NN
-#endif
-    "Image - PBM" TT "*.pbm" NN "Image - PGM" TT "*.pgm" NN
-#if defined(HAVE_LIBPNG)
-    "Image - PNG" TT "*.png" NN
-#endif
-    "Image - PNM" TT "*.pnm" NN "Image - PPM" TT "*.ppm" NN;
+//   static const char *input_formats =
+//     "All Files" TT "*.*" NN "Geometry - Gmsh GEO" TT "*.geo" NN
+// #if defined(HAVE_ACIS)
+//     "Geometry - ACIS" TT "*.sat" NN
+// #endif
+// #if defined(HAVE_OCC)
+//     "Geometry - OpenCASCADE BRep" TT "*.brep" NN
+//     "Geometry - OpenCASCADE IGES" TT "*.{igs,iges}" NN
+//     "Geometry - OpenCASCADE STEP" TT "*.{stp,step}" NN
+// #endif
+//     "Mesh - Gmsh MSH" TT "*.msh" NN "Mesh - Diffpack 3D" TT "*.diff" NN
+//     "Mesh - I-deas Universal" TT "*.unv" NN
+// #if defined(HAVE_MED)
+//     "Mesh - MED" TT "*.{med,mmed}" NN
+// #endif
+//     "Mesh - INRIA Medit" TT "*.mesh" NN "Mesh - Nastran Bulk Data File" TT
+//     "*.{bdf,nas}" NN "Mesh - Plot3D Structured Mesh" TT "*.p3d" NN
+//     "Mesh - STL Surface" TT "*.stl" NN "Mesh - VTK" TT "*.vtk" NN
+//     "Mesh - VRML Surface" TT "*.{wrl,vrml}" NN "Mesh - PLY2 Surface" TT
+//     "*.ply2" NN "Post-processing - Gmsh POS" TT "*.pos" NN
+// #if defined(HAVE_MED)
+//     "Post-processing - MED" TT "*.rmed" NN
+// #endif
+//     "Image - BMP" TT "*.bmp" NN
+// #if defined(HAVE_LIBJPEG)
+//     "Image - JPEG" TT "*.{jpg,jpeg}" NN
+// #endif
+//     "Image - PBM" TT "*.pbm" NN "Image - PGM" TT "*.pgm" NN
+// #if defined(HAVE_LIBPNG)
+//     "Image - PNG" TT "*.png" NN
+// #endif
+//     "Image - PNM" TT "*.pnm" NN "Image - PPM" TT "*.ppm" NN;
+
 
 static const char *input_formats_conti2d =
     // "All Files" TT "*.*" NN 
     "Grid - Surfer 6" TT "*.grd" NN;
     // "Grid - XYZ" TT "*.xyz" NN;
 
-static void showgrd(string grdfile,string name_data="Grid Data")
+
+static void showgrd_plane(string grdfile,string name_data="Grid Data",double z0=0)
 {
   cContinuation conti;
   conti.m_InputFile=grdfile;
-  string gmshfile=conti.Grid2Gmsh(conti.m_InputFile,name_data); //transform grid file to gmsh
+  string gmshfile=conti.Grid2Gmsh_plane(conti.m_InputFile,name_data,z0); //transform grid file to gmsh
   OpenProject(gmshfile);
   drawContext::global()->draw();
+  //delete gmshfile
+  #if defined(WIN32)
+    string cmd="del "+gmshfile;
+  #else
+    string cmd="rm "+gmshfile;
+  #endif
+  system(cmd.c_str());
 }
-
+static void showgrd_surface(string grdfile,string name_data="Grid Data",string topography="")
+{
+  cContinuation conti;
+  conti.m_InputFile=grdfile;
+  string gmshfile=conti.Grid2Gmsh_surface(conti.m_InputFile,name_data,topography); //transform grid file to gmsh
+  OpenProject(gmshfile);
+  drawContext::global()->draw();
+  //delete gmshfile
+  #if defined(WIN32)
+    string cmd="del "+gmshfile;
+  #else
+    string cmd="rm "+gmshfile;
+  #endif
+  system(cmd.c_str());
+}
 void run_UWC_p2p(string inputfile,double height_in, double height_out)
 {
   Msg::Info("Calculating upward continuation from plane to plane");
@@ -201,7 +224,8 @@ void run_UWC_p2p(string inputfile,double height_in, double height_out)
     ss<<height_in; ss>>str_height_in;
     ss2<<height_out; ss2>>str_height_out;
     name_field_conti="UWC_"+str_height_in+"_"+str_height_out;
-    showgrd(outputfile,name_field_conti);
+    showgrd_plane(inputfile,"Observation Field",height_in);
+    showgrd_plane(outputfile,name_field_conti,height_out);
   }else
   {
     Msg::Error("Input file name is empty: %s",inputfile.c_str());
@@ -226,14 +250,15 @@ void run_UWC_p2s(string inputfile,double height_in, string topofile)
     string name_field_conti;
     string str_height_in, str_height_out;
     name_field_conti="UWC_p2s";
-    showgrd(outputfile,name_field_conti);
+    showgrd_plane(inputfile,"Observation Field",height_in);
+    showgrd_surface(outputfile,name_field_conti,topofile);
   }else
   {
     Msg::Error("Input file name is empty: %s",inputfile.c_str());
     return;
   }
 }
-void run_DWC_p2p(string inputfile,double height_in, double height_out)
+void run_DWC_p2p(string inputfile,double height_in, double height_out,double kmax)
 {
   Msg::Info("Calculating downward continuation from plane to plane");
   Msg::Info("The observation field data file: %s",inputfile.c_str());
@@ -248,21 +273,22 @@ void run_DWC_p2p(string inputfile,double height_in, double height_out)
     int num_thread=(max_threads>1?max_threads:1);
     Msg::Info("All the %d threads are used",num_thread);
     int num_ext=0;
-    conti.DWC_p2p(inputfile,outputfile,height_in,height_out,num_ext,100,DWC_LANDWEBER,num_thread);
+    conti.DWC_p2p(inputfile,outputfile,height_in,height_out,num_ext,kmax,DWC_LANDWEBER,num_thread);
     string name_field_conti;
     string str_height_in, str_height_out;
     stringstream ss,ss2;
     ss<<height_in; ss>>str_height_in;
     ss2<<height_out; ss2>>str_height_out;
     name_field_conti="DWC_"+str_height_in+"_"+str_height_out;
-    showgrd(outputfile,name_field_conti);
+    showgrd_plane(inputfile,"Observation Field",height_in);
+    showgrd_plane(outputfile,name_field_conti,height_out);
   }else
   {
     Msg::Error("Input file name is empty: %s",inputfile.c_str());
     return;
   }
 }
-void run_DWC_s2p(string inputfile,string topofile, double height_out)
+void run_DWC_s2p(string inputfile,string topofile, double height_out,double kmax)
 {
   Msg::Info("Calculating downward continuation from surface to plane");
   Msg::Info("The observation field data file: %s",inputfile.c_str());
@@ -277,13 +303,15 @@ void run_DWC_s2p(string inputfile,string topofile, double height_out)
     int num_thread=(max_threads>1?max_threads:1);
     Msg::Info("All the %d threads are used",num_thread);
     int num_ext=0;
-    conti.DWC_s2p(inputfile,outputfile,topofile,height_out,num_ext,100,DWC_LANDWEBER,num_thread);
+    conti.DWC_s2p(inputfile,outputfile,topofile,height_out,num_ext,kmax,DWC_LANDWEBER,num_thread);
     string name_field_conti;
     string str_height_out;
     stringstream ss2;
     ss2<<height_out; ss2>>str_height_out;
     name_field_conti="DWC_s_"+str_height_out;
-    showgrd(outputfile,name_field_conti);
+    showgrd_surface(inputfile,"Observation Field",topofile);
+    showgrd_plane(outputfile,name_field_conti,height_out);
+    
   }else
   {
     Msg::Error("Input file name is empty: %s",inputfile.c_str());
@@ -295,14 +323,14 @@ static void file_open_grd(Fl_Widget * w, void *data)
   {
     if(!data) return;
     std::string mode((char *)data);
-    int n = PView::list.size();
+    // int n = PView::list.size();
     std::cout<<input_formats_conti2d<<std::endl;
     int f = fileChooser(FILE_CHOOSER_SINGLE, (mode == "open") ? "Open" : "Merge",
                         input_formats_conti2d);
     if(f) {
       if(mode == "open")
         {
-          showgrd(fileChooserGetName(1));
+          showgrd_plane(fileChooserGetName(1));
         }
         else
         {
@@ -311,29 +339,29 @@ static void file_open_grd(Fl_Widget * w, void *data)
       drawContext::global()->draw();
     }
   }
-  static void file_open_merge_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
-    std::string mode((char *)data);
-    int n = PView::list.size();
-    int f = fileChooser(FILE_CHOOSER_MULTI, (mode == "open") ? "Open" : "Merge",
-                        input_formats);
-    if(f) {
-      for(int i = 1; i <= f; i++) {
-        if(mode == "open")
-          OpenProject(fileChooserGetName(i));
-        else
-          MergeFile(fileChooserGetName(i));
-      }
-      if(n != (int)PView::list.size())
-        FlGui::instance()->openModule("Post-processing");
-      if(CTX::instance()->launchSolverAtStartup >= 0)
-        solver_cb(0, (void *)(intptr_t)CTX::instance()->launchSolverAtStartup);
-      else if(onelabUtils::haveSolverToRun())
-        onelab_cb(0, (void *)"check");
-      drawContext::global()->draw();
-    }
-  }
+  // static void file_open_merge_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
+  //   std::string mode((char *)data);
+  //   int n = PView::list.size();
+  //   int f = fileChooser(FILE_CHOOSER_MULTI, (mode == "open") ? "Open" : "Merge",
+  //                       input_formats);
+  //   if(f) {
+  //     for(int i = 1; i <= f; i++) {
+  //       if(mode == "open")
+  //         OpenProject(fileChooserGetName(i));
+  //       else
+  //         MergeFile(fileChooserGetName(i));
+  //     }
+  //     if(n != (int)PView::list.size())
+  //       FlGui::instance()->openModule("Post-processing");
+  //     if(CTX::instance()->launchSolverAtStartup >= 0)
+  //       solver_cb(0, (void *)(intptr_t)CTX::instance()->launchSolverAtStartup);
+  //     else if(onelabUtils::haveSolverToRun())
+  //       onelab_cb(0, (void *)"check");
+  //     drawContext::global()->draw();
+  //   }
+  // }
 
   static void file_open_recent_cb(Fl_Widget * w, void *data)
   {
@@ -350,67 +378,67 @@ static void file_open_grd(Fl_Widget * w, void *data)
       onelab_cb(0, (void *)"check");
   }
 
-  static void file_clear_cb(Fl_Widget * w, void *data)
-  {
-    if(CTX::instance()->lock || FlGui::instance()->onelab->isBusy()) {
-      Msg::Info("I'm busy! Ask me that later...");
-      return;
-    }
-    ClearProject();
-    if(onelabUtils::haveSolverToRun())
-      onelab_cb(0, (void *)"reset"); // this will call OpenProject
-    else
-      OpenProject(GModel::current()->getFileName());
-    drawContext::global()->draw();
-  }
+  // static void file_clear_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(CTX::instance()->lock || FlGui::instance()->onelab->isBusy()) {
+  //     Msg::Info("I'm busy! Ask me that later...");
+  //     return;
+  //   }
+  //   ClearProject();
+  //   if(onelabUtils::haveSolverToRun())
+  //     onelab_cb(0, (void *)"reset"); // this will call OpenProject
+  //   else
+  //     OpenProject(GModel::current()->getFileName());
+  //   drawContext::global()->draw();
+  // }
 
-  static void file_remote_cb(Fl_Widget * w, void *data)
-  {
-    onelab::localNetworkClient *c;
-    onelab::server::citer it =
-      onelab::server::instance()->findClient("GmshRemote");
-    if(it == onelab::server::instance()->lastClient()) {
-      c = new gmshLocalNetworkClient("GmshRemote", "");
-      c->setSocketSwitch("-socket");
-    }
-    else
-      c = (onelab::localNetworkClient *)(*it);
-    GmshServer *server = c->getGmshServer();
+  // static void file_remote_cb(Fl_Widget * w, void *data)
+  // {
+  //   onelab::localNetworkClient *c;
+  //   onelab::server::citer it =
+  //     onelab::server::instance()->findClient("GmshRemote");
+  //   if(it == onelab::server::instance()->lastClient()) {
+  //     c = new gmshLocalNetworkClient("GmshRemote", "");
+  //     c->setSocketSwitch("-socket");
+  //   }
+  //   else
+  //     c = (onelab::localNetworkClient *)(*it);
+  //   GmshServer *server = c->getGmshServer();
 
-    std::string str((const char *)data);
+  //   std::string str((const char *)data);
 
-    if(str == "start") {
-      if(server) {
-        Msg::Error("Cannot start: remote Gmsh is already running");
-        return;
-      }
-      c->setExecutable(connectionChooser());
-      if(c->getExecutable().size()) c->run();
-    }
-    else {
-      if(!server) {
-        Msg::Error("Cannot %s: remote Gmsh not running", str.c_str());
-        return;
-      }
-      if(str == "stop") {
-        server->SendString(GmshSocket::GMSH_STOP, "Disconnect!");
-      }
-      else if(str == "merge") {
-        const char *file = fl_input("Merge", "/tmp/data.pos");
-        if(file) server->SendString(GmshSocket::GMSH_MERGE_FILE, file);
-      }
-      else if(str == "clear") {
-        server->SendString(GmshSocket::GMSH_PARSE_STRING, "Delete All;");
-        for(int i = PView::list.size() - 1; i >= 0; i--)
-          if(PView::list[i]->getData()->isRemote()) delete PView::list[i];
-        FlGui::instance()->updateViews(true, true);
-        drawContext::global()->draw();
-      }
-      else if(str == "test") {
-        server->SendString(GmshSocket::GMSH_SPEED_TEST, "Speed test");
-      }
-    }
-  }
+  //   if(str == "start") {
+  //     if(server) {
+  //       Msg::Error("Cannot start: remote Gmsh is already running");
+  //       return;
+  //     }
+  //     c->setExecutable(connectionChooser());
+  //     if(c->getExecutable().size()) c->run();
+  //   }
+  //   else {
+  //     if(!server) {
+  //       Msg::Error("Cannot %s: remote Gmsh not running", str.c_str());
+  //       return;
+  //     }
+  //     if(str == "stop") {
+  //       server->SendString(GmshSocket::GMSH_STOP, "Disconnect!");
+  //     }
+  //     else if(str == "merge") {
+  //       const char *file = fl_input("Merge", "/tmp/data.pos");
+  //       if(file) server->SendString(GmshSocket::GMSH_MERGE_FILE, file);
+  //     }
+  //     else if(str == "clear") {
+  //       server->SendString(GmshSocket::GMSH_PARSE_STRING, "Delete All;");
+  //       for(int i = PView::list.size() - 1; i >= 0; i--)
+  //         if(PView::list[i]->getData()->isRemote()) delete PView::list[i];
+  //       FlGui::instance()->updateViews(true, true);
+  //       drawContext::global()->draw();
+  //     }
+  //     else if(str == "test") {
+  //       server->SendString(GmshSocket::GMSH_SPEED_TEST, "Speed test");
+  //     }
+  //   }
+  // }
 
   static void file_window_cb(Fl_Widget * w, void *data)
   {
@@ -765,36 +793,36 @@ static void file_open_grd(Fl_Widget * w, void *data)
     Msg::StatusBar(true, "Done writing '%s'", fileName.c_str());
   }
 
-  static void file_rename_cb(Fl_Widget * w, void *data)
-  {
-  test:
-    if(fileChooser(FILE_CHOOSER_CREATE, "Rename", "")) {
-      std::string name = fileChooserGetName(1);
-      if(CTX::instance()->confirmOverwrite) {
-        if(!StatFile(name))
-          if(!fl_choice(
-               "File '%s' already exists.\n\nDo you want to replace it?",
-               "Cancel", "Replace", 0, name.c_str()))
-            goto test;
-      }
-      rename(GModel::current()->getFileName().c_str(), name.c_str());
-      GModel::current()->setFileName(name);
-      GModel::current()->setName(SplitFileName(name)[1]);
-      Msg::SetOnelabChanged(3);
-      if(onelabUtils::haveSolverToRun()) onelab_cb(0, (void *)"check");
-      drawContext::global()->draw();
-    }
-  }
+  // static void file_rename_cb(Fl_Widget * w, void *data)
+  // {
+  // test:
+  //   if(fileChooser(FILE_CHOOSER_CREATE, "Rename", "")) {
+  //     std::string name = fileChooserGetName(1);
+  //     if(CTX::instance()->confirmOverwrite) {
+  //       if(!StatFile(name))
+  //         if(!fl_choice(
+  //              "File '%s' already exists.\n\nDo you want to replace it?",
+  //              "Cancel", "Replace", 0, name.c_str()))
+  //           goto test;
+  //     }
+  //     rename(GModel::current()->getFileName().c_str(), name.c_str());
+  //     GModel::current()->setFileName(name);
+  //     GModel::current()->setName(SplitFileName(name)[1]);
+  //     Msg::SetOnelabChanged(3);
+  //     if(onelabUtils::haveSolverToRun()) onelab_cb(0, (void *)"check");
+  //     drawContext::global()->draw();
+  //   }
+  // }
 
-  static void file_delete_cb(Fl_Widget * w, void *data)
-  {
-    if(fl_choice("Do you really want to delete file '%s'?", "Cancel", "Delete",
-                 0, GModel::current()->getFileName().c_str())) {
-      UnlinkFile(GModel::current()->getFileName());
-      Msg::Info("Deleted `%s'", GModel::current()->getFileName().c_str());
-      file_clear_cb(0, 0);
-    }
-  }
+  // static void file_delete_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(fl_choice("Do you really want to delete file '%s'?", "Cancel", "Delete",
+  //                0, GModel::current()->getFileName().c_str())) {
+  //     UnlinkFile(GModel::current()->getFileName());
+  //     Msg::Info("Deleted `%s'", GModel::current()->getFileName().c_str());
+  //     file_clear_cb(0, 0);
+  //   }
+  // }
 
   void file_quit_cb(Fl_Widget * w, void *data) { Msg::Exit(0); }
 
@@ -843,22 +871,22 @@ static void file_open_grd(Fl_Widget * w, void *data)
     fl_open_uri("http://gmsh.info/doc/texinfo/");
   }
 
-  static void help_basic_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->help->basic->show();
-  }
+  // static void help_basic_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->help->basic->show();
+  // }
 
   void help_about_cb(Fl_Widget * w, void *data)
   {
     FlGui::instance()->help->about->show();
   }
 
-  static void geometry_edit_cb(Fl_Widget * w, void *data)
-  {
-    std::string prog = FixWindowsPath(CTX::instance()->editor);
-    std::string file = FixWindowsPath(GModel::current()->getFileName());
-    SystemCall(ReplaceSubString("%s", file, prog));
-  }
+  // static void geometry_edit_cb(Fl_Widget * w, void *data)
+  // {
+  //   std::string prog = FixWindowsPath(CTX::instance()->editor);
+  //   std::string file = FixWindowsPath(GModel::current()->getFileName());
+  //   SystemCall(ReplaceSubString("%s", file, prog));
+  // }
 
   void onelab_reload_cb(Fl_Widget * w, void *data)
   {
@@ -911,1283 +939,1283 @@ static void file_open_grd(Fl_Widget * w, void *data)
     drawContext::global()->draw();
   }
 
-  static void add_new_point_based_entity(const std::string &what, int pane)
-  {
-    opt_general_axes(0, GMSH_SET | GMSH_GUI, 3);
-    opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    drawContext::global()->draw();
+  // static void add_new_point_based_entity(const std::string &what, int pane)
+  // {
+  //   opt_general_axes(0, GMSH_SET | GMSH_GUI, 3);
+  //   opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   drawContext::global()->draw();
 
-    FlGui::instance()->elementaryContext->show(pane);
+  //   FlGui::instance()->elementaryContext->show(pane);
 
-    while(1) {
-      for(std::size_t i = 0; i < FlGui::instance()->graph.size(); i++)
-        for(std::size_t j = 0; j < FlGui::instance()->graph[i]->gl.size(); j++)
-          FlGui::instance()->graph[i]->gl[j]->addPointMode = 1;
-      std::string name = what;
-      std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-      Msg::StatusGl(
-        "Move mouse and/or enter coordinates\n"
-        "[Press 'Shift' to hold position, 'e' to add %s or 'q' to abort]",
-        name.c_str());
-      char ib = FlGui::instance()->selectEntity(ENT_NONE);
-      if(ib == 'e') {
-        switch(pane) {
-        case 1:
-          add_point(GModel::current()->getFileName(),
-                    FlGui::instance()->elementaryContext->input[4]->value(),
-                    FlGui::instance()->elementaryContext->input[5]->value(),
-                    FlGui::instance()->elementaryContext->input[6]->value(),
-                    FlGui::instance()->elementaryContext->input[7]->value());
-          break;
-        case 2:
-          add_circle(GModel::current()->getFileName(),
-                     FlGui::instance()->elementaryContext->input[8]->value(),
-                     FlGui::instance()->elementaryContext->input[9]->value(),
-                     FlGui::instance()->elementaryContext->input[10]->value(),
-                     FlGui::instance()->elementaryContext->input[11]->value(),
-                     FlGui::instance()->elementaryContext->input[12]->value(),
-                     FlGui::instance()->elementaryContext->input[13]->value());
-          break;
-        case 3:
-          add_ellipse(GModel::current()->getFileName(),
-                      FlGui::instance()->elementaryContext->input[14]->value(),
-                      FlGui::instance()->elementaryContext->input[15]->value(),
-                      FlGui::instance()->elementaryContext->input[16]->value(),
-                      FlGui::instance()->elementaryContext->input[17]->value(),
-                      FlGui::instance()->elementaryContext->input[18]->value(),
-                      FlGui::instance()->elementaryContext->input[19]->value(),
-                      FlGui::instance()->elementaryContext->input[20]->value());
-          break;
-        case 4:
-          add_disk(GModel::current()->getFileName(),
-                   FlGui::instance()->elementaryContext->input[21]->value(),
-                   FlGui::instance()->elementaryContext->input[22]->value(),
-                   FlGui::instance()->elementaryContext->input[23]->value(),
-                   FlGui::instance()->elementaryContext->input[24]->value(),
-                   FlGui::instance()->elementaryContext->input[25]->value());
-          break;
-        case 5:
-          add_rectangle(
-            GModel::current()->getFileName(),
-            FlGui::instance()->elementaryContext->input[26]->value(),
-            FlGui::instance()->elementaryContext->input[27]->value(),
-            FlGui::instance()->elementaryContext->input[28]->value(),
-            FlGui::instance()->elementaryContext->input[29]->value(),
-            FlGui::instance()->elementaryContext->input[30]->value(),
-            FlGui::instance()->elementaryContext->input[31]->value());
-          break;
-        case 6:
-          add_sphere(GModel::current()->getFileName(),
-                     FlGui::instance()->elementaryContext->input[32]->value(),
-                     FlGui::instance()->elementaryContext->input[33]->value(),
-                     FlGui::instance()->elementaryContext->input[34]->value(),
-                     FlGui::instance()->elementaryContext->input[35]->value(),
-                     FlGui::instance()->elementaryContext->input[36]->value(),
-                     FlGui::instance()->elementaryContext->input[37]->value(),
-                     FlGui::instance()->elementaryContext->input[38]->value());
-          break;
-        case 7:
-          add_cylinder(
-            GModel::current()->getFileName(),
-            FlGui::instance()->elementaryContext->input[39]->value(),
-            FlGui::instance()->elementaryContext->input[40]->value(),
-            FlGui::instance()->elementaryContext->input[41]->value(),
-            FlGui::instance()->elementaryContext->input[42]->value(),
-            FlGui::instance()->elementaryContext->input[43]->value(),
-            FlGui::instance()->elementaryContext->input[44]->value(),
-            FlGui::instance()->elementaryContext->input[45]->value(),
-            FlGui::instance()->elementaryContext->input[46]->value());
-          break;
-        case 8:
-          add_box(GModel::current()->getFileName(),
-                  FlGui::instance()->elementaryContext->input[47]->value(),
-                  FlGui::instance()->elementaryContext->input[48]->value(),
-                  FlGui::instance()->elementaryContext->input[49]->value(),
-                  FlGui::instance()->elementaryContext->input[50]->value(),
-                  FlGui::instance()->elementaryContext->input[51]->value(),
-                  FlGui::instance()->elementaryContext->input[52]->value());
-          break;
-        case 9:
-          add_torus(GModel::current()->getFileName(),
-                    FlGui::instance()->elementaryContext->input[53]->value(),
-                    FlGui::instance()->elementaryContext->input[54]->value(),
-                    FlGui::instance()->elementaryContext->input[55]->value(),
-                    FlGui::instance()->elementaryContext->input[56]->value(),
-                    FlGui::instance()->elementaryContext->input[57]->value(),
-                    FlGui::instance()->elementaryContext->input[58]->value());
-          break;
-        case 10:
-          add_cone(GModel::current()->getFileName(),
-                   FlGui::instance()->elementaryContext->input[59]->value(),
-                   FlGui::instance()->elementaryContext->input[60]->value(),
-                   FlGui::instance()->elementaryContext->input[61]->value(),
-                   FlGui::instance()->elementaryContext->input[62]->value(),
-                   FlGui::instance()->elementaryContext->input[63]->value(),
-                   FlGui::instance()->elementaryContext->input[64]->value(),
-                   FlGui::instance()->elementaryContext->input[65]->value(),
-                   FlGui::instance()->elementaryContext->input[66]->value(),
-                   FlGui::instance()->elementaryContext->input[67]->value());
-          break;
-        case 11:
-          add_wedge(GModel::current()->getFileName(),
-                    FlGui::instance()->elementaryContext->input[68]->value(),
-                    FlGui::instance()->elementaryContext->input[69]->value(),
-                    FlGui::instance()->elementaryContext->input[70]->value(),
-                    FlGui::instance()->elementaryContext->input[71]->value(),
-                    FlGui::instance()->elementaryContext->input[72]->value(),
-                    FlGui::instance()->elementaryContext->input[73]->value(),
-                    FlGui::instance()->elementaryContext->input[74]->value());
-          break;
-        }
-        FlGui::instance()->resetVisibility();
-        drawContext::global()->draw();
-      }
-      if(ib == 'q') {
-        for(std::size_t i = 0; i < FlGui::instance()->graph.size(); i++)
-          for(std::size_t j = 0; j < FlGui::instance()->graph[i]->gl.size();
-              j++)
-            FlGui::instance()->graph[i]->gl[j]->addPointMode = 0;
-        break;
-      }
-    }
+  //   while(1) {
+  //     for(std::size_t i = 0; i < FlGui::instance()->graph.size(); i++)
+  //       for(std::size_t j = 0; j < FlGui::instance()->graph[i]->gl.size(); j++)
+  //         FlGui::instance()->graph[i]->gl[j]->addPointMode = 1;
+  //     std::string name = what;
+  //     std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+  //     Msg::StatusGl(
+  //       "Move mouse and/or enter coordinates\n"
+  //       "[Press 'Shift' to hold position, 'e' to add %s or 'q' to abort]",
+  //       name.c_str());
+  //     char ib = FlGui::instance()->selectEntity(ENT_NONE);
+  //     if(ib == 'e') {
+  //       switch(pane) {
+  //       case 1:
+  //         add_point(GModel::current()->getFileName(),
+  //                   FlGui::instance()->elementaryContext->input[4]->value(),
+  //                   FlGui::instance()->elementaryContext->input[5]->value(),
+  //                   FlGui::instance()->elementaryContext->input[6]->value(),
+  //                   FlGui::instance()->elementaryContext->input[7]->value());
+  //         break;
+  //       case 2:
+  //         add_circle(GModel::current()->getFileName(),
+  //                    FlGui::instance()->elementaryContext->input[8]->value(),
+  //                    FlGui::instance()->elementaryContext->input[9]->value(),
+  //                    FlGui::instance()->elementaryContext->input[10]->value(),
+  //                    FlGui::instance()->elementaryContext->input[11]->value(),
+  //                    FlGui::instance()->elementaryContext->input[12]->value(),
+  //                    FlGui::instance()->elementaryContext->input[13]->value());
+  //         break;
+  //       case 3:
+  //         add_ellipse(GModel::current()->getFileName(),
+  //                     FlGui::instance()->elementaryContext->input[14]->value(),
+  //                     FlGui::instance()->elementaryContext->input[15]->value(),
+  //                     FlGui::instance()->elementaryContext->input[16]->value(),
+  //                     FlGui::instance()->elementaryContext->input[17]->value(),
+  //                     FlGui::instance()->elementaryContext->input[18]->value(),
+  //                     FlGui::instance()->elementaryContext->input[19]->value(),
+  //                     FlGui::instance()->elementaryContext->input[20]->value());
+  //         break;
+  //       case 4:
+  //         add_disk(GModel::current()->getFileName(),
+  //                  FlGui::instance()->elementaryContext->input[21]->value(),
+  //                  FlGui::instance()->elementaryContext->input[22]->value(),
+  //                  FlGui::instance()->elementaryContext->input[23]->value(),
+  //                  FlGui::instance()->elementaryContext->input[24]->value(),
+  //                  FlGui::instance()->elementaryContext->input[25]->value());
+  //         break;
+  //       case 5:
+  //         add_rectangle(
+  //           GModel::current()->getFileName(),
+  //           FlGui::instance()->elementaryContext->input[26]->value(),
+  //           FlGui::instance()->elementaryContext->input[27]->value(),
+  //           FlGui::instance()->elementaryContext->input[28]->value(),
+  //           FlGui::instance()->elementaryContext->input[29]->value(),
+  //           FlGui::instance()->elementaryContext->input[30]->value(),
+  //           FlGui::instance()->elementaryContext->input[31]->value());
+  //         break;
+  //       case 6:
+  //         add_sphere(GModel::current()->getFileName(),
+  //                    FlGui::instance()->elementaryContext->input[32]->value(),
+  //                    FlGui::instance()->elementaryContext->input[33]->value(),
+  //                    FlGui::instance()->elementaryContext->input[34]->value(),
+  //                    FlGui::instance()->elementaryContext->input[35]->value(),
+  //                    FlGui::instance()->elementaryContext->input[36]->value(),
+  //                    FlGui::instance()->elementaryContext->input[37]->value(),
+  //                    FlGui::instance()->elementaryContext->input[38]->value());
+  //         break;
+  //       case 7:
+  //         add_cylinder(
+  //           GModel::current()->getFileName(),
+  //           FlGui::instance()->elementaryContext->input[39]->value(),
+  //           FlGui::instance()->elementaryContext->input[40]->value(),
+  //           FlGui::instance()->elementaryContext->input[41]->value(),
+  //           FlGui::instance()->elementaryContext->input[42]->value(),
+  //           FlGui::instance()->elementaryContext->input[43]->value(),
+  //           FlGui::instance()->elementaryContext->input[44]->value(),
+  //           FlGui::instance()->elementaryContext->input[45]->value(),
+  //           FlGui::instance()->elementaryContext->input[46]->value());
+  //         break;
+  //       case 8:
+  //         add_box(GModel::current()->getFileName(),
+  //                 FlGui::instance()->elementaryContext->input[47]->value(),
+  //                 FlGui::instance()->elementaryContext->input[48]->value(),
+  //                 FlGui::instance()->elementaryContext->input[49]->value(),
+  //                 FlGui::instance()->elementaryContext->input[50]->value(),
+  //                 FlGui::instance()->elementaryContext->input[51]->value(),
+  //                 FlGui::instance()->elementaryContext->input[52]->value());
+  //         break;
+  //       case 9:
+  //         add_torus(GModel::current()->getFileName(),
+  //                   FlGui::instance()->elementaryContext->input[53]->value(),
+  //                   FlGui::instance()->elementaryContext->input[54]->value(),
+  //                   FlGui::instance()->elementaryContext->input[55]->value(),
+  //                   FlGui::instance()->elementaryContext->input[56]->value(),
+  //                   FlGui::instance()->elementaryContext->input[57]->value(),
+  //                   FlGui::instance()->elementaryContext->input[58]->value());
+  //         break;
+  //       case 10:
+  //         add_cone(GModel::current()->getFileName(),
+  //                  FlGui::instance()->elementaryContext->input[59]->value(),
+  //                  FlGui::instance()->elementaryContext->input[60]->value(),
+  //                  FlGui::instance()->elementaryContext->input[61]->value(),
+  //                  FlGui::instance()->elementaryContext->input[62]->value(),
+  //                  FlGui::instance()->elementaryContext->input[63]->value(),
+  //                  FlGui::instance()->elementaryContext->input[64]->value(),
+  //                  FlGui::instance()->elementaryContext->input[65]->value(),
+  //                  FlGui::instance()->elementaryContext->input[66]->value(),
+  //                  FlGui::instance()->elementaryContext->input[67]->value());
+  //         break;
+  //       case 11:
+  //         add_wedge(GModel::current()->getFileName(),
+  //                   FlGui::instance()->elementaryContext->input[68]->value(),
+  //                   FlGui::instance()->elementaryContext->input[69]->value(),
+  //                   FlGui::instance()->elementaryContext->input[70]->value(),
+  //                   FlGui::instance()->elementaryContext->input[71]->value(),
+  //                   FlGui::instance()->elementaryContext->input[72]->value(),
+  //                   FlGui::instance()->elementaryContext->input[73]->value(),
+  //                   FlGui::instance()->elementaryContext->input[74]->value());
+  //         break;
+  //       }
+  //       FlGui::instance()->resetVisibility();
+  //       drawContext::global()->draw();
+  //     }
+  //     if(ib == 'q') {
+  //       for(std::size_t i = 0; i < FlGui::instance()->graph.size(); i++)
+  //         for(std::size_t j = 0; j < FlGui::instance()->graph[i]->gl.size();
+  //             j++)
+  //           FlGui::instance()->graph[i]->gl[j]->addPointMode = 0;
+  //       break;
+  //     }
+  //   }
 
-    FlGui::instance()->elementaryContext->hide();
-    drawContext::setDrawGeomTransientFunction(0);
+  //   FlGui::instance()->elementaryContext->hide();
+  //   drawContext::setDrawGeomTransientFunction(0);
 
-    // at the end, not during creation to avoid having things jumping around
-    SetBoundingBox();
-    Msg::StatusGl("");
-  }
+  //   // at the end, not during creation to avoid having things jumping around
+  //   SetBoundingBox();
+  //   Msg::StatusGl("");
+  // }
 
-  static void add_new_multiline(const std::string &type)
-  {
-    opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-    drawContext::global()->draw();
+  // static void add_new_multiline(const std::string &type)
+  // {
+  //   opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //   drawContext::global()->draw();
 
-    std::vector<int> p;
-    while(1) {
-      if(p.empty())
-        Msg::StatusGl("Select control points\n"
-                      "[Press 'e' to end selection or 'q' to abort]");
-      else
-        Msg::StatusGl("Select control points\n"
-                      "[Press 'e' to end selection, 'u' to undo last selection "
-                      "or 'q' to abort]");
-      char ib = FlGui::instance()->selectEntity(ENT_POINT);
-      if(ib == 'l') {
-        for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
-            i++) {
-          FlGui::instance()->selectedVertices[i]->setSelection(1);
-          p.push_back(FlGui::instance()->selectedVertices[i]->tag());
-        }
-        drawContext::global()->draw();
-      }
-      if(ib == 'r') {
-        Msg::Warning(
-          "Entity de-selection not supported yet during multi-line creation");
-      }
-      if(ib == 'e') {
-        if(p.size() >= 2)
-          add_multline(type, p, GModel::current()->getFileName());
-        FlGui::instance()->resetVisibility();
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        p.clear();
-      }
-      if(ib == 'u') {
-        if(p.size()) {
-          GVertex *gv = GModel::current()->getVertexByTag(p.back());
-          if(gv) gv->setSelection(0);
-          drawContext::global()->draw();
-          p.pop_back();
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        break;
-      }
-    }
+  //   std::vector<int> p;
+  //   while(1) {
+  //     if(p.empty())
+  //       Msg::StatusGl("Select control points\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]");
+  //     else
+  //       Msg::StatusGl("Select control points\n"
+  //                     "[Press 'e' to end selection, 'u' to undo last selection "
+  //                     "or 'q' to abort]");
+  //     char ib = FlGui::instance()->selectEntity(ENT_POINT);
+  //     if(ib == 'l') {
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
+  //           i++) {
+  //         FlGui::instance()->selectedVertices[i]->setSelection(1);
+  //         p.push_back(FlGui::instance()->selectedVertices[i]->tag());
+  //       }
+  //       drawContext::global()->draw();
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning(
+  //         "Entity de-selection not supported yet during multi-line creation");
+  //     }
+  //     if(ib == 'e') {
+  //       if(p.size() >= 2)
+  //         add_multline(type, p, GModel::current()->getFileName());
+  //       FlGui::instance()->resetVisibility();
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       p.clear();
+  //     }
+  //     if(ib == 'u') {
+  //       if(p.size()) {
+  //         GVertex *gv = GModel::current()->getVertexByTag(p.back());
+  //         if(gv) gv->setSelection(0);
+  //         drawContext::global()->draw();
+  //         p.pop_back();
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       break;
+  //     }
+  //   }
 
-    Msg::StatusGl("");
-  }
+  //   Msg::StatusGl("");
+  // }
 
-  static void add_new_line()
-  {
-    opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-    drawContext::global()->draw();
+  // static void add_new_line()
+  // {
+  //   opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //   drawContext::global()->draw();
 
-    std::vector<int> p;
-    while(1) {
-      if(p.empty())
-        Msg::StatusGl("Select start point\n"
-                      "[Press 'q' to abort]");
-      if(p.size() == 1)
-        Msg::StatusGl("Select end point\n"
-                      "[Press 'u' to undo last selection or 'q' to abort]");
-      char ib = FlGui::instance()->selectEntity(ENT_POINT);
-      if(ib == 'l') {
-        FlGui::instance()->selectedVertices[0]->setSelection(1);
-        drawContext::global()->draw();
-        p.push_back(FlGui::instance()->selectedVertices[0]->tag());
-      }
-      if(ib == 'r') {
-        Msg::Warning(
-          "Entity de-selection not supported yet during curve creation");
-      }
-      if(ib == 'u') {
-        if(p.size()) {
-          GVertex *gv = GModel::current()->getVertexByTag(p.back());
-          if(gv) gv->setSelection(0);
-          drawContext::global()->draw();
-          p.pop_back();
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        break;
-      }
-      if(p.size() == 2) {
-        add_multline("Line", p, GModel::current()->getFileName());
-        FlGui::instance()->resetVisibility();
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        p.clear();
-      }
-    }
+  //   std::vector<int> p;
+  //   while(1) {
+  //     if(p.empty())
+  //       Msg::StatusGl("Select start point\n"
+  //                     "[Press 'q' to abort]");
+  //     if(p.size() == 1)
+  //       Msg::StatusGl("Select end point\n"
+  //                     "[Press 'u' to undo last selection or 'q' to abort]");
+  //     char ib = FlGui::instance()->selectEntity(ENT_POINT);
+  //     if(ib == 'l') {
+  //       FlGui::instance()->selectedVertices[0]->setSelection(1);
+  //       drawContext::global()->draw();
+  //       p.push_back(FlGui::instance()->selectedVertices[0]->tag());
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning(
+  //         "Entity de-selection not supported yet during curve creation");
+  //     }
+  //     if(ib == 'u') {
+  //       if(p.size()) {
+  //         GVertex *gv = GModel::current()->getVertexByTag(p.back());
+  //         if(gv) gv->setSelection(0);
+  //         drawContext::global()->draw();
+  //         p.pop_back();
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       break;
+  //     }
+  //     if(p.size() == 2) {
+  //       add_multline("Line", p, GModel::current()->getFileName());
+  //       FlGui::instance()->resetVisibility();
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       p.clear();
+  //     }
+  //   }
 
-    Msg::StatusGl("");
-  }
+  //   Msg::StatusGl("");
+  // }
 
-  static void add_new_circle_arc()
-  {
-    opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-    drawContext::global()->draw();
+  // static void add_new_circle_arc()
+  // {
+  //   opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //   drawContext::global()->draw();
 
-    std::vector<int> p;
-    while(1) {
-      if(p.empty())
-        Msg::StatusGl("Select start point\n"
-                      "[Press 'q' to abort]");
-      if(p.size() == 1)
-        Msg::StatusGl("Select center point\n"
-                      "[Press 'u' to undo last selection or 'q' to abort]");
-      if(p.size() == 2)
-        Msg::StatusGl("Select end point\n"
-                      "[Press 'u' to undo last selection or 'q' to abort]");
-      char ib = FlGui::instance()->selectEntity(ENT_POINT);
-      if(ib == 'l') {
-        FlGui::instance()->selectedVertices[0]->setSelection(1);
-        drawContext::global()->draw();
-        p.push_back(FlGui::instance()->selectedVertices[0]->tag());
-      }
-      if(ib == 'r') {
-        Msg::Warning(
-          "Entity de-selection not supported yet during circle creation");
-      }
-      if(ib == 'u') {
-        if(p.size()) {
-          GVertex *gv = GModel::current()->getVertexByTag(p.back());
-          if(gv) gv->setSelection(0);
-          drawContext::global()->draw();
-          p.pop_back();
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        break;
-      }
-      if(p.size() == 3) {
-        add_circle_arc(p[0], p[1], p[2],
-                       GModel::current()->getFileName()); // begin, center, end
-        FlGui::instance()->resetVisibility();
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        p.clear();
-      }
-    }
+  //   std::vector<int> p;
+  //   while(1) {
+  //     if(p.empty())
+  //       Msg::StatusGl("Select start point\n"
+  //                     "[Press 'q' to abort]");
+  //     if(p.size() == 1)
+  //       Msg::StatusGl("Select center point\n"
+  //                     "[Press 'u' to undo last selection or 'q' to abort]");
+  //     if(p.size() == 2)
+  //       Msg::StatusGl("Select end point\n"
+  //                     "[Press 'u' to undo last selection or 'q' to abort]");
+  //     char ib = FlGui::instance()->selectEntity(ENT_POINT);
+  //     if(ib == 'l') {
+  //       FlGui::instance()->selectedVertices[0]->setSelection(1);
+  //       drawContext::global()->draw();
+  //       p.push_back(FlGui::instance()->selectedVertices[0]->tag());
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning(
+  //         "Entity de-selection not supported yet during circle creation");
+  //     }
+  //     if(ib == 'u') {
+  //       if(p.size()) {
+  //         GVertex *gv = GModel::current()->getVertexByTag(p.back());
+  //         if(gv) gv->setSelection(0);
+  //         drawContext::global()->draw();
+  //         p.pop_back();
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       break;
+  //     }
+  //     if(p.size() == 3) {
+  //       add_circle_arc(p[0], p[1], p[2],
+  //                      GModel::current()->getFileName()); // begin, center, end
+  //       FlGui::instance()->resetVisibility();
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       p.clear();
+  //     }
+  //   }
 
-    Msg::StatusGl("");
-  }
+  //   Msg::StatusGl("");
+  // }
 
-  static void add_new_ellipse_arc()
-  {
-    opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-    drawContext::global()->draw();
+  // static void add_new_ellipse_arc()
+  // {
+  //   opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //   drawContext::global()->draw();
 
-    std::vector<int> p;
-    while(1) {
-      if(p.empty())
-        Msg::StatusGl("Select start point\n"
-                      "[Press 'q' to abort]");
-      if(p.size() == 1)
-        Msg::StatusGl("Select center point\n"
-                      "[Press 'u' to undo last selection or 'q' to abort]");
-      if(p.size() == 2)
-        Msg::StatusGl("Select major axis point\n"
-                      "[Press 'u' to undo last selection or 'q' to abort]");
-      if(p.size() == 3)
-        Msg::StatusGl("Select end point\n"
-                      "[Press 'u' to undo last selection or 'q' to abort]");
-      char ib = FlGui::instance()->selectEntity(ENT_POINT);
-      if(ib == 'l') {
-        FlGui::instance()->selectedVertices[0]->setSelection(1);
-        drawContext::global()->draw();
-        p.push_back(FlGui::instance()->selectedVertices[0]->tag());
-      }
-      if(ib == 'r') {
-        Msg::Warning(
-          "Entity de-selection not supported yet during ellipse creation");
-      }
-      if(ib == 'u') {
-        if(p.size()) {
-          GVertex *gv = GModel::current()->getVertexByTag(p.back());
-          if(gv) gv->setSelection(0);
-          drawContext::global()->draw();
-          p.pop_back();
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        break;
-      }
-      if(p.size() == 4) {
-        add_ellipse_arc(p[0], p[1], p[2], p[3],
-                        GModel::current()->getFileName());
-        FlGui::instance()->resetVisibility();
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        p.clear();
-      }
-    }
+  //   std::vector<int> p;
+  //   while(1) {
+  //     if(p.empty())
+  //       Msg::StatusGl("Select start point\n"
+  //                     "[Press 'q' to abort]");
+  //     if(p.size() == 1)
+  //       Msg::StatusGl("Select center point\n"
+  //                     "[Press 'u' to undo last selection or 'q' to abort]");
+  //     if(p.size() == 2)
+  //       Msg::StatusGl("Select major axis point\n"
+  //                     "[Press 'u' to undo last selection or 'q' to abort]");
+  //     if(p.size() == 3)
+  //       Msg::StatusGl("Select end point\n"
+  //                     "[Press 'u' to undo last selection or 'q' to abort]");
+  //     char ib = FlGui::instance()->selectEntity(ENT_POINT);
+  //     if(ib == 'l') {
+  //       FlGui::instance()->selectedVertices[0]->setSelection(1);
+  //       drawContext::global()->draw();
+  //       p.push_back(FlGui::instance()->selectedVertices[0]->tag());
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning(
+  //         "Entity de-selection not supported yet during ellipse creation");
+  //     }
+  //     if(ib == 'u') {
+  //       if(p.size()) {
+  //         GVertex *gv = GModel::current()->getVertexByTag(p.back());
+  //         if(gv) gv->setSelection(0);
+  //         drawContext::global()->draw();
+  //         p.pop_back();
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       break;
+  //     }
+  //     if(p.size() == 4) {
+  //       add_ellipse_arc(p[0], p[1], p[2], p[3],
+  //                       GModel::current()->getFileName());
+  //       FlGui::instance()->resetVisibility();
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       p.clear();
+  //     }
+  //   }
 
-    Msg::StatusGl("");
-  }
+  //   Msg::StatusGl("");
+  // }
 
-  static int selectContour(int type, int num, List_T *List)
-  {
-    int k = 0;
+  // static int selectContour(int type, int num, List_T *List)
+  // {
+  //   int k = 0;
 
-    switch(type) {
-    case ENT_CURVE:
-      k = allEdgesLinked(num, List);
-      for(int i = 0; i < List_Nbr(List); i++) {
-        int ip;
-        List_Read(List, i, &ip);
-        GEdge *ge = GModel::current()->getEdgeByTag(abs(ip));
-        if(ge) ge->setSelection(1);
-      }
-      break;
-    case ENT_SURFACE:
-      k = allFacesLinked(num, List);
-      for(int i = 0; i < List_Nbr(List); i++) {
-        int ip;
-        List_Read(List, i, &ip);
-        GFace *gf = GModel::current()->getFaceByTag(abs(ip));
-        if(gf) gf->setSelection(1);
-      }
-      break;
-    }
+  //   switch(type) {
+  //   case ENT_CURVE:
+  //     k = allEdgesLinked(num, List);
+  //     for(int i = 0; i < List_Nbr(List); i++) {
+  //       int ip;
+  //       List_Read(List, i, &ip);
+  //       GEdge *ge = GModel::current()->getEdgeByTag(abs(ip));
+  //       if(ge) ge->setSelection(1);
+  //     }
+  //     break;
+  //   case ENT_SURFACE:
+  //     k = allFacesLinked(num, List);
+  //     for(int i = 0; i < List_Nbr(List); i++) {
+  //       int ip;
+  //       List_Read(List, i, &ip);
+  //       GFace *gf = GModel::current()->getFaceByTag(abs(ip));
+  //       if(gf) gf->setSelection(1);
+  //     }
+  //     break;
+  //   }
 
-    drawContext::global()->draw();
-    return k;
-  }
+  //   drawContext::global()->draw();
+  //   return k;
+  // }
 
-  static void add_new_surface_volume(int mode)
-  {
-    List_T *List1 = List_Create(10, 10, sizeof(int));
-    List_T *List2 = List_Create(10, 10, sizeof(int));
-    int type;
-    if(mode == 2) {
-      type = ENT_SURFACE;
-      opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
-      opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1);
-    }
-    else {
-      type = ENT_CURVE;
-      opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-      opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
-    }
-    drawContext::global()->draw();
+  // static void add_new_surface_volume(int mode)
+  // {
+  //   List_T *List1 = List_Create(10, 10, sizeof(int));
+  //   List_T *List2 = List_Create(10, 10, sizeof(int));
+  //   int type;
+  //   if(mode == 2) {
+  //     type = ENT_SURFACE;
+  //     opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
+  //     opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1);
+  //   }
+  //   else {
+  //     type = ENT_CURVE;
+  //     opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //     opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
+  //   }
+  //   drawContext::global()->draw();
 
-    while(1) {
-      List_Reset(List1);
-      List_Reset(List2);
+  //   while(1) {
+  //     List_Reset(List1);
+  //     List_Reset(List2);
 
-      while(1) {
-        if(type == ENT_CURVE) {
-          if(!List_Nbr(List1))
-            Msg::StatusGl("Select surface boundary\n"
-                          "[Press 'q' to abort]");
-          else
-            Msg::StatusGl("Select surface boundary\n"
-                          "[Press 'u' to undo last selection or 'q' to abort]");
-        }
-        else {
-          if(!List_Nbr(List1))
-            Msg::StatusGl("Select volume boundary\n"
-                          "[Press 'q' to abort]");
-          else
-            Msg::StatusGl("Select volume boundary\n"
-                          "[Press 'u' to undo last selection or 'q' to abort]");
-        }
+  //     while(1) {
+  //       if(type == ENT_CURVE) {
+  //         if(!List_Nbr(List1))
+  //           Msg::StatusGl("Select surface boundary\n"
+  //                         "[Press 'q' to abort]");
+  //         else
+  //           Msg::StatusGl("Select surface boundary\n"
+  //                         "[Press 'u' to undo last selection or 'q' to abort]");
+  //       }
+  //       else {
+  //         if(!List_Nbr(List1))
+  //           Msg::StatusGl("Select volume boundary\n"
+  //                         "[Press 'q' to abort]");
+  //         else
+  //           Msg::StatusGl("Select volume boundary\n"
+  //                         "[Press 'u' to undo last selection or 'q' to abort]");
+  //       }
 
-        char ib = FlGui::instance()->selectEntity(type);
-        if(ib == 'q') {
-          GModel::current()->setSelection(0);
-          drawContext::global()->draw();
-          goto stopall;
-        }
-        if(ib == 'u') {
-          if(List_Nbr(List1) > 0) {
-            int num;
-            List_Read(List1, List_Nbr(List1) - 1, &num);
-            if(type == ENT_CURVE) {
-              GEdge *ge = GModel::current()->getEdgeByTag(abs(num));
-              if(ge) ge->setSelection(0);
-            }
-            else {
-              GFace *gf = GModel::current()->getFaceByTag(abs(num));
-              if(gf) gf->setSelection(0);
-            }
-            List_Pop(List1);
-            drawContext::global()->draw();
-          }
-        }
-        if(ib == 'r') {
-          Msg::Warning("Entity de-selection not supported yet during "
-                       "surface/volume creation");
-        }
-        if(ib == 'l') {
-          int num = (type == ENT_CURVE) ?
-                      FlGui::instance()->selectedEdges[0]->tag() :
-                      FlGui::instance()->selectedFaces[0]->tag();
-          if(selectContour(type, num, List1)) {
-            if(type == ENT_CURVE)
-              add_lineloop(List1, GModel::current()->getFileName(), &num);
-            else
-              add_surfloop(List1, GModel::current()->getFileName(), &num);
-            List_Reset(List1);
-            List_Add(List2, &num);
-            while(1) {
-              if(!List_Nbr(List1))
-                Msg::StatusGl("Select hole boundaries (if none, press 'e')\n"
-                              "[Press 'e' to end selection or 'q' to abort]");
-              else
-                Msg::StatusGl(
-                  "Select hole boundaries\n"
-                  "[Press 'e' to end selection, 'u' to undo last selection "
-                  "or 'q' to abort]");
-              ib = FlGui::instance()->selectEntity(type);
-              if(ib == 'q') {
-                GModel::current()->setSelection(0);
-                drawContext::global()->draw();
-                goto stopall;
-              }
-              if(ib == 'e') {
-                GModel::current()->setSelection(0);
-                drawContext::global()->draw();
-                List_Reset(List1);
-                break;
-              }
-              if(ib == 'u') {
-                if(List_Nbr(List1) > 0) {
-                  int num;
-                  List_Read(List1, List_Nbr(List1) - 1, &num);
-                  if(type == ENT_CURVE) {
-                    GEdge *ge = GModel::current()->getEdgeByTag(abs(num));
-                    if(ge) ge->setSelection(0);
-                  }
-                  else {
-                    GFace *gf = GModel::current()->getFaceByTag(abs(num));
-                    if(gf) gf->setSelection(0);
-                  }
-                  List_Pop(List1);
-                  drawContext::global()->draw();
-                }
-              }
-              if(ib == 'l') {
-                int size = (type == ENT_CURVE) ?
-                             FlGui::instance()->selectedEdges.size() :
-                             FlGui::instance()->selectedFaces.size();
-                for(int i = 0; i < size; i++) {
-                  int num = (type == ENT_CURVE) ?
-                              FlGui::instance()->selectedEdges[i]->tag() :
-                              FlGui::instance()->selectedFaces[i]->tag();
-                  if(selectContour(type, num, List1)) {
-                    if(type == ENT_CURVE)
-                      add_lineloop(List1, GModel::current()->getFileName(),
-                                   &num);
-                    else
-                      add_surfloop(List1, GModel::current()->getFileName(),
-                                   &num);
-                    List_Reset(List1);
-                    List_Add(List2, &num);
-                  }
-                }
-              }
-              if(ib == 'r') {
-                Msg::Warning("Entity de-selection not supported yet during "
-                             "surface/volume creation");
-              }
-            }
-            List_Unique(List2, fcmp_absint);
-            if(List_Nbr(List2)) {
-              switch(mode) {
-              case 0:
-                add_surf("Plane Surface", List2,
-                         GModel::current()->getFileName());
-                break;
-              case 1:
-                add_surf("Surface", List2, GModel::current()->getFileName());
-                break;
-              case 2: add_vol(List2, GModel::current()->getFileName()); break;
-              }
-              FlGui::instance()->resetVisibility();
-              GModel::current()->setSelection(0);
-              drawContext::global()->draw();
-              break;
-            }
-          } // if selectContour
-        }
-      }
-    }
+  //       char ib = FlGui::instance()->selectEntity(type);
+  //       if(ib == 'q') {
+  //         GModel::current()->setSelection(0);
+  //         drawContext::global()->draw();
+  //         goto stopall;
+  //       }
+  //       if(ib == 'u') {
+  //         if(List_Nbr(List1) > 0) {
+  //           int num;
+  //           List_Read(List1, List_Nbr(List1) - 1, &num);
+  //           if(type == ENT_CURVE) {
+  //             GEdge *ge = GModel::current()->getEdgeByTag(abs(num));
+  //             if(ge) ge->setSelection(0);
+  //           }
+  //           else {
+  //             GFace *gf = GModel::current()->getFaceByTag(abs(num));
+  //             if(gf) gf->setSelection(0);
+  //           }
+  //           List_Pop(List1);
+  //           drawContext::global()->draw();
+  //         }
+  //       }
+  //       if(ib == 'r') {
+  //         Msg::Warning("Entity de-selection not supported yet during "
+  //                      "surface/volume creation");
+  //       }
+  //       if(ib == 'l') {
+  //         int num = (type == ENT_CURVE) ?
+  //                     FlGui::instance()->selectedEdges[0]->tag() :
+  //                     FlGui::instance()->selectedFaces[0]->tag();
+  //         if(selectContour(type, num, List1)) {
+  //           if(type == ENT_CURVE)
+  //             add_lineloop(List1, GModel::current()->getFileName(), &num);
+  //           else
+  //             add_surfloop(List1, GModel::current()->getFileName(), &num);
+  //           List_Reset(List1);
+  //           List_Add(List2, &num);
+  //           while(1) {
+  //             if(!List_Nbr(List1))
+  //               Msg::StatusGl("Select hole boundaries (if none, press 'e')\n"
+  //                             "[Press 'e' to end selection or 'q' to abort]");
+  //             else
+  //               Msg::StatusGl(
+  //                 "Select hole boundaries\n"
+  //                 "[Press 'e' to end selection, 'u' to undo last selection "
+  //                 "or 'q' to abort]");
+  //             ib = FlGui::instance()->selectEntity(type);
+  //             if(ib == 'q') {
+  //               GModel::current()->setSelection(0);
+  //               drawContext::global()->draw();
+  //               goto stopall;
+  //             }
+  //             if(ib == 'e') {
+  //               GModel::current()->setSelection(0);
+  //               drawContext::global()->draw();
+  //               List_Reset(List1);
+  //               break;
+  //             }
+  //             if(ib == 'u') {
+  //               if(List_Nbr(List1) > 0) {
+  //                 int num;
+  //                 List_Read(List1, List_Nbr(List1) - 1, &num);
+  //                 if(type == ENT_CURVE) {
+  //                   GEdge *ge = GModel::current()->getEdgeByTag(abs(num));
+  //                   if(ge) ge->setSelection(0);
+  //                 }
+  //                 else {
+  //                   GFace *gf = GModel::current()->getFaceByTag(abs(num));
+  //                   if(gf) gf->setSelection(0);
+  //                 }
+  //                 List_Pop(List1);
+  //                 drawContext::global()->draw();
+  //               }
+  //             }
+  //             if(ib == 'l') {
+  //               int size = (type == ENT_CURVE) ?
+  //                            FlGui::instance()->selectedEdges.size() :
+  //                            FlGui::instance()->selectedFaces.size();
+  //               for(int i = 0; i < size; i++) {
+  //                 int num = (type == ENT_CURVE) ?
+  //                             FlGui::instance()->selectedEdges[i]->tag() :
+  //                             FlGui::instance()->selectedFaces[i]->tag();
+  //                 if(selectContour(type, num, List1)) {
+  //                   if(type == ENT_CURVE)
+  //                     add_lineloop(List1, GModel::current()->getFileName(),
+  //                                  &num);
+  //                   else
+  //                     add_surfloop(List1, GModel::current()->getFileName(),
+  //                                  &num);
+  //                   List_Reset(List1);
+  //                   List_Add(List2, &num);
+  //                 }
+  //               }
+  //             }
+  //             if(ib == 'r') {
+  //               Msg::Warning("Entity de-selection not supported yet during "
+  //                            "surface/volume creation");
+  //             }
+  //           }
+  //           List_Unique(List2, fcmp_absint);
+  //           if(List_Nbr(List2)) {
+  //             switch(mode) {
+  //             case 0:
+  //               add_surf("Plane Surface", List2,
+  //                        GModel::current()->getFileName());
+  //               break;
+  //             case 1:
+  //               add_surf("Surface", List2, GModel::current()->getFileName());
+  //               break;
+  //             case 2: add_vol(List2, GModel::current()->getFileName()); break;
+  //             }
+  //             FlGui::instance()->resetVisibility();
+  //             GModel::current()->setSelection(0);
+  //             drawContext::global()->draw();
+  //             break;
+  //           }
+  //         } // if selectContour
+  //       }
+  //     }
+  //   }
 
-  stopall:
-    List_Delete(List1);
-    List_Delete(List2);
+  // stopall:
+  //   List_Delete(List1);
+  //   List_Delete(List2);
 
-    Msg::StatusGl("");
-  }
+  //   Msg::StatusGl("");
+  // }
 
-  static void geometry_elementary_set_factory_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
-    std::string str((const char *)data);
-    add_infile("SetFactory(\"" + str + "\");",
-               GModel::current()->getFileName());
-    if(FlGui::available())
-      Msg::StatusBar(false, "Setting %s factory", str.c_str());
-  }
+  // static void geometry_elementary_set_factory_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
+  //   std::string str((const char *)data);
+  //   add_infile("SetFactory(\"" + str + "\");",
+  //              GModel::current()->getFileName());
+  //   if(FlGui::available())
+  //     Msg::StatusBar(false, "Setting %s factory", str.c_str());
+  // }
 
-  static void geometry_elementary_add_new_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
+  // static void geometry_elementary_add_new_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
 
-    std::string str((const char *)data);
-    if(str == "Parameter")
-      FlGui::instance()->elementaryContext->show(0);
-    else if(str == "Point")
-      add_new_point_based_entity(str, 1);
-    else if(str == "Line")
-      add_new_line();
-    else if(str == "Spline")
-      add_new_multiline(str);
-    else if(str == "BSpline")
-      add_new_multiline(str);
-    else if(str == "Bezier")
-      add_new_multiline(str);
-    else if(str == "Circle arc")
-      add_new_circle_arc();
-    else if(str == "Circle")
-      add_new_point_based_entity(str, 2);
-    else if(str == "Ellipse arc")
-      add_new_ellipse_arc();
-    else if(str == "Ellipse")
-      add_new_point_based_entity(str, 3);
-    else if(str == "Disk")
-      add_new_point_based_entity(str, 4);
-    else if(str == "Rectangle")
-      add_new_point_based_entity(str, 5);
-    else if(str == "Sphere")
-      add_new_point_based_entity(str, 6);
-    else if(str == "Cylinder")
-      add_new_point_based_entity(str, 7);
-    else if(str == "Box")
-      add_new_point_based_entity(str, 8);
-    else if(str == "Torus")
-      add_new_point_based_entity(str, 9);
-    else if(str == "Cone")
-      add_new_point_based_entity(str, 10);
-    else if(str == "Wedge")
-      add_new_point_based_entity(str, 11);
-    else if(str == "Plane Surface")
-      add_new_surface_volume(0);
-    else if(str == "Surface")
-      add_new_surface_volume(1);
-    else if(str == "Volume")
-      add_new_surface_volume(2);
-    else
-      Msg::Error("Unknown entity to create: %s", str.c_str());
-  }
+  //   std::string str((const char *)data);
+  //   if(str == "Parameter")
+  //     FlGui::instance()->elementaryContext->show(0);
+  //   else if(str == "Point")
+  //     add_new_point_based_entity(str, 1);
+  //   else if(str == "Line")
+  //     add_new_line();
+  //   else if(str == "Spline")
+  //     add_new_multiline(str);
+  //   else if(str == "BSpline")
+  //     add_new_multiline(str);
+  //   else if(str == "Bezier")
+  //     add_new_multiline(str);
+  //   else if(str == "Circle arc")
+  //     add_new_circle_arc();
+  //   else if(str == "Circle")
+  //     add_new_point_based_entity(str, 2);
+  //   else if(str == "Ellipse arc")
+  //     add_new_ellipse_arc();
+  //   else if(str == "Ellipse")
+  //     add_new_point_based_entity(str, 3);
+  //   else if(str == "Disk")
+  //     add_new_point_based_entity(str, 4);
+  //   else if(str == "Rectangle")
+  //     add_new_point_based_entity(str, 5);
+  //   else if(str == "Sphere")
+  //     add_new_point_based_entity(str, 6);
+  //   else if(str == "Cylinder")
+  //     add_new_point_based_entity(str, 7);
+  //   else if(str == "Box")
+  //     add_new_point_based_entity(str, 8);
+  //   else if(str == "Torus")
+  //     add_new_point_based_entity(str, 9);
+  //   else if(str == "Cone")
+  //     add_new_point_based_entity(str, 10);
+  //   else if(str == "Wedge")
+  //     add_new_point_based_entity(str, 11);
+  //   else if(str == "Plane Surface")
+  //     add_new_surface_volume(0);
+  //   else if(str == "Surface")
+  //     add_new_surface_volume(1);
+  //   else if(str == "Volume")
+  //     add_new_surface_volume(2);
+  //   else
+  //     Msg::Error("Unknown entity to create: %s", str.c_str());
+  // }
 
-  static void action_point_line_surface_volume(int action,
-                                               const std::string &onwhat = "")
-  {
-    drawContext::global()->draw();
+  // static void action_point_line_surface_volume(int action,
+  //                                              const std::string &onwhat = "")
+  // {
+  //   drawContext::global()->draw();
 
-    std::string what(onwhat);
-    if(what == "Point")
-      opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    else if(what == "Curve")
-      opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-    else if(what == "Surface")
-      opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
-    else if(what == "Volume")
-      opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1);
+  //   std::string what(onwhat);
+  //   if(what == "Point")
+  //     opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   else if(what == "Curve")
+  //     opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //   else if(what == "Surface")
+  //     opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
+  //   else if(what == "Volume")
+  //     opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1);
 
-    std::vector<std::pair<int, int> > dimTags, dimTagsSaved;
-    while(1) {
-      std::string str;
-      int type;
-      if(what == "Point") {
-        str = "points";
-        type = ENT_POINT;
-      }
-      else if(what == "Curve") {
-        str = "curves";
-        type = ENT_CURVE;
-      }
-      else if(what == "Surface") {
-        str = "surfaces";
-        type = ENT_SURFACE;
-      }
-      else if(what == "Volume") {
-        str = "volumes";
-        type = ENT_VOLUME;
-      }
-      else {
-        switch(FlGui::instance()->transformContext->choice->value()) {
-        case 1:
-          str = "points";
-          type = ENT_POINT;
-          break;
-        case 2:
-          str = "curves";
-          type = ENT_CURVE;
-          break;
-        case 3:
-          str = "surfaces";
-          type = ENT_SURFACE;
-          break;
-        case 4:
-          str = "volumes";
-          type = ENT_VOLUME;
-          break;
-        default:
-          str = "entities";
-          type = ENT_ALL;
-          break;
-        }
-      }
+  //   std::vector<std::pair<int, int> > dimTags, dimTagsSaved;
+  //   while(1) {
+  //     std::string str;
+  //     int type;
+  //     if(what == "Point") {
+  //       str = "points";
+  //       type = ENT_POINT;
+  //     }
+  //     else if(what == "Curve") {
+  //       str = "curves";
+  //       type = ENT_CURVE;
+  //     }
+  //     else if(what == "Surface") {
+  //       str = "surfaces";
+  //       type = ENT_SURFACE;
+  //     }
+  //     else if(what == "Volume") {
+  //       str = "volumes";
+  //       type = ENT_VOLUME;
+  //     }
+  //     else {
+  //       switch(FlGui::instance()->transformContext->choice->value()) {
+  //       case 1:
+  //         str = "points";
+  //         type = ENT_POINT;
+  //         break;
+  //       case 2:
+  //         str = "curves";
+  //         type = ENT_CURVE;
+  //         break;
+  //       case 3:
+  //         str = "surfaces";
+  //         type = ENT_SURFACE;
+  //         break;
+  //       case 4:
+  //         str = "volumes";
+  //         type = ENT_VOLUME;
+  //         break;
+  //       default:
+  //         str = "entities";
+  //         type = ENT_ALL;
+  //         break;
+  //       }
+  //     }
 
-      if(dimTags.empty())
-        Msg::StatusGl("Select %s\n"
-                      "[Press 'e' to end selection or 'q' to abort]",
-                      str.c_str());
-      else
-        Msg::StatusGl("Select %s\n"
-                      "[Press 'e' to end selection, 'u' to undo last selection "
-                      "or 'q' to abort]",
-                      str.c_str());
+  //     if(dimTags.empty())
+  //       Msg::StatusGl("Select %s\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]",
+  //                     str.c_str());
+  //     else
+  //       Msg::StatusGl("Select %s\n"
+  //                     "[Press 'e' to end selection, 'u' to undo last selection "
+  //                     "or 'q' to abort]",
+  //                     str.c_str());
 
-      char ib = FlGui::instance()->selectEntity(type);
-      if(ib == 'l') {
-        for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
-            i++) {
-          FlGui::instance()->selectedVertices[i]->setSelection(1);
-          std::pair<int, int> t(0,
-                                FlGui::instance()->selectedVertices[i]->tag());
-          if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
-            dimTags.push_back(t);
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-            i++) {
-          FlGui::instance()->selectedEdges[i]->setSelection(1);
-          std::pair<int, int> t(1, FlGui::instance()->selectedEdges[i]->tag());
-          if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
-            dimTags.push_back(t);
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
-            i++) {
-          FlGui::instance()->selectedFaces[i]->setSelection(1);
-          std::pair<int, int> t(2, FlGui::instance()->selectedFaces[i]->tag());
-          if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
-            dimTags.push_back(t);
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
-            i++) {
-          FlGui::instance()->selectedRegions[i]->setSelection(1);
-          std::pair<int, int> t(3,
-                                FlGui::instance()->selectedRegions[i]->tag());
-          if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
-            dimTags.push_back(t);
-        }
-        drawContext::global()->draw();
-      }
-      if(ib == 'r') {
-        std::vector<std::pair<int, int> >::iterator it;
-        for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
-            i++) {
-          std::pair<int, int> t(0,
-                                FlGui::instance()->selectedVertices[i]->tag());
-          it = std::find(dimTags.begin(), dimTags.end(), t);
-          if(it != dimTags.end()) {
-            dimTags.erase(it);
-            GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
-            if(ge) ge->setSelection(0);
-          }
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-            i++) {
-          std::pair<int, int> t(1, FlGui::instance()->selectedEdges[i]->tag());
-          it = std::find(dimTags.begin(), dimTags.end(), t);
-          if(it != dimTags.end()) {
-            dimTags.erase(it);
-            GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
-            if(ge) ge->setSelection(0);
-          }
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
-            i++) {
-          std::pair<int, int> t(2, FlGui::instance()->selectedFaces[i]->tag());
-          it = std::find(dimTags.begin(), dimTags.end(), t);
-          if(it != dimTags.end()) {
-            dimTags.erase(it);
-            GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
-            if(ge) ge->setSelection(0);
-          }
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
-            i++) {
-          std::pair<int, int> t(3,
-                                FlGui::instance()->selectedRegions[i]->tag());
-          it = std::find(dimTags.begin(), dimTags.end(), t);
-          if(it != dimTags.end()) {
-            dimTags.erase(it);
-            GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
-            if(ge) ge->setSelection(0);
-          }
-        }
-        drawContext::global()->draw();
-      }
-      if(ib == 'u') {
-        if(dimTags.size()) {
-          std::pair<int, int> t = dimTags.back();
-          GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
-          if(ge) ge->setSelection(0);
-          dimTags.pop_back();
-          drawContext::global()->draw();
-        }
-      }
-      if(ib == 'i') { Msg::Error("Inverting selection!"); }
-      if(ib == 'e') {
-        if(dimTags.size()) {
-          switch(action) {
-          case 0:
-            translate(GModel::current()->getFileName(), dimTags,
-                      FlGui::instance()->transformContext->input[0]->value(),
-                      FlGui::instance()->transformContext->input[1]->value(),
-                      FlGui::instance()->transformContext->input[2]->value(),
-                      FlGui::instance()->transformContext->butt[0]->value());
-            break;
-          case 1:
-            rotate(GModel::current()->getFileName(), dimTags,
-                   FlGui::instance()->transformContext->input[6]->value(),
-                   FlGui::instance()->transformContext->input[7]->value(),
-                   FlGui::instance()->transformContext->input[8]->value(),
-                   FlGui::instance()->transformContext->input[3]->value(),
-                   FlGui::instance()->transformContext->input[4]->value(),
-                   FlGui::instance()->transformContext->input[5]->value(),
-                   FlGui::instance()->transformContext->input[9]->value(),
-                   FlGui::instance()->transformContext->butt[1]->value());
-            break;
-          case 2:
-            dilate(GModel::current()->getFileName(), dimTags,
-                   FlGui::instance()->transformContext->input[10]->value(),
-                   FlGui::instance()->transformContext->input[11]->value(),
-                   FlGui::instance()->transformContext->input[12]->value(),
-                   FlGui::instance()->transformContext->input[13]->value(),
-                   FlGui::instance()->transformContext->input[14]->value(),
-                   FlGui::instance()->transformContext->input[15]->value(),
-                   FlGui::instance()->transformContext->butt[2]->value());
-            break;
-          case 3:
-            symmetry(GModel::current()->getFileName(), dimTags,
-                     FlGui::instance()->transformContext->input[16]->value(),
-                     FlGui::instance()->transformContext->input[17]->value(),
-                     FlGui::instance()->transformContext->input[18]->value(),
-                     FlGui::instance()->transformContext->input[19]->value(),
-                     FlGui::instance()->transformContext->butt[3]->value());
-            break;
-          case 4:
-            extrude(GModel::current()->getFileName(), dimTags,
-                    FlGui::instance()->transformContext->input[0]->value(),
-                    FlGui::instance()->transformContext->input[1]->value(),
-                    FlGui::instance()->transformContext->input[2]->value(),
-                    FlGui::instance()->transformContext->butt[7]->value(),
-                    FlGui::instance()->transformContext->input[21]->value(),
-                    FlGui::instance()->transformContext->butt[8]->value());
-            break;
-          case 5:
-            protude(GModel::current()->getFileName(), dimTags,
-                    FlGui::instance()->transformContext->input[6]->value(),
-                    FlGui::instance()->transformContext->input[7]->value(),
-                    FlGui::instance()->transformContext->input[8]->value(),
-                    FlGui::instance()->transformContext->input[3]->value(),
-                    FlGui::instance()->transformContext->input[4]->value(),
-                    FlGui::instance()->transformContext->input[5]->value(),
-                    FlGui::instance()->transformContext->input[9]->value(),
-                    FlGui::instance()->transformContext->butt[9]->value(),
-                    FlGui::instance()->transformContext->input[22]->value(),
-                    FlGui::instance()->transformContext->butt[10]->value());
-            break;
-          case 6:
-            delete_entities(
-              GModel::current()->getFileName(), dimTags,
-              FlGui::instance()->transformContext->butt[6]->value());
-            break;
-          case 7:
-          case 11: {
-            std::vector<int> tags;
-            for(std::size_t i = 0; i < dimTags.size(); i++) {
-              if((dimTags[i].first == 0 && what == "Point") ||
-                 (dimTags[i].first == 1 && what == "Curve") ||
-                 (dimTags[i].first == 2 && what == "Surface") ||
-                 (dimTags[i].first == 3 && what == "Volume"))
-                tags.push_back(dimTags[i].second);
-            }
-            add_remove_physical(
-              GModel::current()->getFileName(), what, tags,
-              FlGui::instance()->physicalContext->input[0]->value(),
-              FlGui::instance()->physicalContext->butt[0]->value() ?
-                0 :
-                FlGui::instance()->physicalContext->value[0]->value(),
-              FlGui::instance()->physicalContext->append,
-              FlGui::instance()->physicalContext->mode);
-          }
-            FlGui::instance()->physicalContext->show(action == 7 ? false :
-                                                                   true);
-            // ask clients to update the tree using the new physical definition
-            onelab_cb(0, (void *)"check");
-            break;
-          case 8: {
-            std::vector<int> tags;
-            for(std::size_t i = 0; i < dimTags.size(); i++) {
-              if(dimTags[i].first == 0 && what == "Point")
-                tags.push_back(dimTags[i].second);
-            }
-            if(tags.size())
-              add_charlength(GModel::current()->getFileName(), tags,
-                             FlGui::instance()->meshContext->input[0]->value());
-          } break;
-          case 9: {
-            std::vector<int> tags;
-            for(std::size_t i = 0; i < dimTags.size(); i++) {
-              if(dimTags[i].first == 2 && what == "Surface")
-                tags.push_back(dimTags[i].second);
-            }
-            add_recosurf(GModel::current()->getFileName(), tags);
-          } break;
-          case 10: {
-            std::vector<int> tags;
-            for(std::size_t i = 0; i < dimTags.size(); i++) {
-              if((dimTags[i].first == 1 && what == "Curve") ||
-                 (dimTags[i].first == 2 && what == "Surface") ||
-                 (dimTags[i].first == 3 && what == "Volume"))
-                tags.push_back(dimTags[i].second);
-            }
-            add_compound(GModel::current()->getFileName(), what, tags);
-          } break;
-          case 12:
-            if(dimTagsSaved.empty()) {
-              dimTagsSaved = dimTags;
-              dimTags.clear();
-              what = "Curve";
-              continue;
-            }
-            else {
-              std::vector<int> l;
-              for(std::size_t i = 0; i < dimTags.size(); i++) {
-                if(dimTags[i].first == 1) l.push_back(dimTags[i].second);
-              }
-              add_pipe(GModel::current()->getFileName(), dimTagsSaved, l);
-              dimTagsSaved.clear();
-            }
-            break;
-          default: Msg::Error("Unknown action on selected entities"); break;
-          }
-          dimTags.clear();
-          FlGui::instance()->resetVisibility();
-          GModel::current()->setSelection(0);
-          if(action <= 6 || action >= 12) SetBoundingBox();
-          drawContext::global()->draw();
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        break;
-      }
-    }
+  //     char ib = FlGui::instance()->selectEntity(type);
+  //     if(ib == 'l') {
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
+  //           i++) {
+  //         FlGui::instance()->selectedVertices[i]->setSelection(1);
+  //         std::pair<int, int> t(0,
+  //                               FlGui::instance()->selectedVertices[i]->tag());
+  //         if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
+  //           dimTags.push_back(t);
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //           i++) {
+  //         FlGui::instance()->selectedEdges[i]->setSelection(1);
+  //         std::pair<int, int> t(1, FlGui::instance()->selectedEdges[i]->tag());
+  //         if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
+  //           dimTags.push_back(t);
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
+  //           i++) {
+  //         FlGui::instance()->selectedFaces[i]->setSelection(1);
+  //         std::pair<int, int> t(2, FlGui::instance()->selectedFaces[i]->tag());
+  //         if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
+  //           dimTags.push_back(t);
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
+  //           i++) {
+  //         FlGui::instance()->selectedRegions[i]->setSelection(1);
+  //         std::pair<int, int> t(3,
+  //                               FlGui::instance()->selectedRegions[i]->tag());
+  //         if(std::find(dimTags.begin(), dimTags.end(), t) == dimTags.end())
+  //           dimTags.push_back(t);
+  //       }
+  //       drawContext::global()->draw();
+  //     }
+  //     if(ib == 'r') {
+  //       std::vector<std::pair<int, int> >::iterator it;
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
+  //           i++) {
+  //         std::pair<int, int> t(0,
+  //                               FlGui::instance()->selectedVertices[i]->tag());
+  //         it = std::find(dimTags.begin(), dimTags.end(), t);
+  //         if(it != dimTags.end()) {
+  //           dimTags.erase(it);
+  //           GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
+  //           if(ge) ge->setSelection(0);
+  //         }
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //           i++) {
+  //         std::pair<int, int> t(1, FlGui::instance()->selectedEdges[i]->tag());
+  //         it = std::find(dimTags.begin(), dimTags.end(), t);
+  //         if(it != dimTags.end()) {
+  //           dimTags.erase(it);
+  //           GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
+  //           if(ge) ge->setSelection(0);
+  //         }
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
+  //           i++) {
+  //         std::pair<int, int> t(2, FlGui::instance()->selectedFaces[i]->tag());
+  //         it = std::find(dimTags.begin(), dimTags.end(), t);
+  //         if(it != dimTags.end()) {
+  //           dimTags.erase(it);
+  //           GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
+  //           if(ge) ge->setSelection(0);
+  //         }
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
+  //           i++) {
+  //         std::pair<int, int> t(3,
+  //                               FlGui::instance()->selectedRegions[i]->tag());
+  //         it = std::find(dimTags.begin(), dimTags.end(), t);
+  //         if(it != dimTags.end()) {
+  //           dimTags.erase(it);
+  //           GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
+  //           if(ge) ge->setSelection(0);
+  //         }
+  //       }
+  //       drawContext::global()->draw();
+  //     }
+  //     if(ib == 'u') {
+  //       if(dimTags.size()) {
+  //         std::pair<int, int> t = dimTags.back();
+  //         GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
+  //         if(ge) ge->setSelection(0);
+  //         dimTags.pop_back();
+  //         drawContext::global()->draw();
+  //       }
+  //     }
+  //     if(ib == 'i') { Msg::Error("Inverting selection!"); }
+  //     if(ib == 'e') {
+  //       if(dimTags.size()) {
+  //         switch(action) {
+  //         case 0:
+  //           translate(GModel::current()->getFileName(), dimTags,
+  //                     FlGui::instance()->transformContext->input[0]->value(),
+  //                     FlGui::instance()->transformContext->input[1]->value(),
+  //                     FlGui::instance()->transformContext->input[2]->value(),
+  //                     FlGui::instance()->transformContext->butt[0]->value());
+  //           break;
+  //         case 1:
+  //           rotate(GModel::current()->getFileName(), dimTags,
+  //                  FlGui::instance()->transformContext->input[6]->value(),
+  //                  FlGui::instance()->transformContext->input[7]->value(),
+  //                  FlGui::instance()->transformContext->input[8]->value(),
+  //                  FlGui::instance()->transformContext->input[3]->value(),
+  //                  FlGui::instance()->transformContext->input[4]->value(),
+  //                  FlGui::instance()->transformContext->input[5]->value(),
+  //                  FlGui::instance()->transformContext->input[9]->value(),
+  //                  FlGui::instance()->transformContext->butt[1]->value());
+  //           break;
+  //         case 2:
+  //           dilate(GModel::current()->getFileName(), dimTags,
+  //                  FlGui::instance()->transformContext->input[10]->value(),
+  //                  FlGui::instance()->transformContext->input[11]->value(),
+  //                  FlGui::instance()->transformContext->input[12]->value(),
+  //                  FlGui::instance()->transformContext->input[13]->value(),
+  //                  FlGui::instance()->transformContext->input[14]->value(),
+  //                  FlGui::instance()->transformContext->input[15]->value(),
+  //                  FlGui::instance()->transformContext->butt[2]->value());
+  //           break;
+  //         case 3:
+  //           symmetry(GModel::current()->getFileName(), dimTags,
+  //                    FlGui::instance()->transformContext->input[16]->value(),
+  //                    FlGui::instance()->transformContext->input[17]->value(),
+  //                    FlGui::instance()->transformContext->input[18]->value(),
+  //                    FlGui::instance()->transformContext->input[19]->value(),
+  //                    FlGui::instance()->transformContext->butt[3]->value());
+  //           break;
+  //         case 4:
+  //           extrude(GModel::current()->getFileName(), dimTags,
+  //                   FlGui::instance()->transformContext->input[0]->value(),
+  //                   FlGui::instance()->transformContext->input[1]->value(),
+  //                   FlGui::instance()->transformContext->input[2]->value(),
+  //                   FlGui::instance()->transformContext->butt[7]->value(),
+  //                   FlGui::instance()->transformContext->input[21]->value(),
+  //                   FlGui::instance()->transformContext->butt[8]->value());
+  //           break;
+  //         case 5:
+  //           protude(GModel::current()->getFileName(), dimTags,
+  //                   FlGui::instance()->transformContext->input[6]->value(),
+  //                   FlGui::instance()->transformContext->input[7]->value(),
+  //                   FlGui::instance()->transformContext->input[8]->value(),
+  //                   FlGui::instance()->transformContext->input[3]->value(),
+  //                   FlGui::instance()->transformContext->input[4]->value(),
+  //                   FlGui::instance()->transformContext->input[5]->value(),
+  //                   FlGui::instance()->transformContext->input[9]->value(),
+  //                   FlGui::instance()->transformContext->butt[9]->value(),
+  //                   FlGui::instance()->transformContext->input[22]->value(),
+  //                   FlGui::instance()->transformContext->butt[10]->value());
+  //           break;
+  //         case 6:
+  //           delete_entities(
+  //             GModel::current()->getFileName(), dimTags,
+  //             FlGui::instance()->transformContext->butt[6]->value());
+  //           break;
+  //         case 7:
+  //         case 11: {
+  //           std::vector<int> tags;
+  //           for(std::size_t i = 0; i < dimTags.size(); i++) {
+  //             if((dimTags[i].first == 0 && what == "Point") ||
+  //                (dimTags[i].first == 1 && what == "Curve") ||
+  //                (dimTags[i].first == 2 && what == "Surface") ||
+  //                (dimTags[i].first == 3 && what == "Volume"))
+  //               tags.push_back(dimTags[i].second);
+  //           }
+  //           add_remove_physical(
+  //             GModel::current()->getFileName(), what, tags,
+  //             FlGui::instance()->physicalContext->input[0]->value(),
+  //             FlGui::instance()->physicalContext->butt[0]->value() ?
+  //               0 :
+  //               FlGui::instance()->physicalContext->value[0]->value(),
+  //             FlGui::instance()->physicalContext->append,
+  //             FlGui::instance()->physicalContext->mode);
+  //         }
+  //           FlGui::instance()->physicalContext->show(action == 7 ? false :
+  //                                                                  true);
+  //           // ask clients to update the tree using the new physical definition
+  //           onelab_cb(0, (void *)"check");
+  //           break;
+  //         case 8: {
+  //           std::vector<int> tags;
+  //           for(std::size_t i = 0; i < dimTags.size(); i++) {
+  //             if(dimTags[i].first == 0 && what == "Point")
+  //               tags.push_back(dimTags[i].second);
+  //           }
+  //           if(tags.size())
+  //             add_charlength(GModel::current()->getFileName(), tags,
+  //                            FlGui::instance()->meshContext->input[0]->value());
+  //         } break;
+  //         case 9: {
+  //           std::vector<int> tags;
+  //           for(std::size_t i = 0; i < dimTags.size(); i++) {
+  //             if(dimTags[i].first == 2 && what == "Surface")
+  //               tags.push_back(dimTags[i].second);
+  //           }
+  //           add_recosurf(GModel::current()->getFileName(), tags);
+  //         } break;
+  //         case 10: {
+  //           std::vector<int> tags;
+  //           for(std::size_t i = 0; i < dimTags.size(); i++) {
+  //             if((dimTags[i].first == 1 && what == "Curve") ||
+  //                (dimTags[i].first == 2 && what == "Surface") ||
+  //                (dimTags[i].first == 3 && what == "Volume"))
+  //               tags.push_back(dimTags[i].second);
+  //           }
+  //           add_compound(GModel::current()->getFileName(), what, tags);
+  //         } break;
+  //         case 12:
+  //           if(dimTagsSaved.empty()) {
+  //             dimTagsSaved = dimTags;
+  //             dimTags.clear();
+  //             what = "Curve";
+  //             continue;
+  //           }
+  //           else {
+  //             std::vector<int> l;
+  //             for(std::size_t i = 0; i < dimTags.size(); i++) {
+  //               if(dimTags[i].first == 1) l.push_back(dimTags[i].second);
+  //             }
+  //             add_pipe(GModel::current()->getFileName(), dimTagsSaved, l);
+  //             dimTagsSaved.clear();
+  //           }
+  //           break;
+  //         default: Msg::Error("Unknown action on selected entities"); break;
+  //         }
+  //         dimTags.clear();
+  //         FlGui::instance()->resetVisibility();
+  //         GModel::current()->setSelection(0);
+  //         if(action <= 6 || action >= 12) SetBoundingBox();
+  //         drawContext::global()->draw();
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       break;
+  //     }
+  //   }
 
-    Msg::StatusGl("");
-  }
+  //   Msg::StatusGl("");
+  // }
 
-  static void geometry_elementary_translate_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->transformContext->show(0);
-    action_point_line_surface_volume(0);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_translate_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(0);
+  //   action_point_line_surface_volume(0);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_rotate_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->transformContext->show(1);
-    action_point_line_surface_volume(1);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_rotate_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(1);
+  //   action_point_line_surface_volume(1);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_scale_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->transformContext->show(2);
-    action_point_line_surface_volume(2);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_scale_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(2);
+  //   action_point_line_surface_volume(2);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_symmetry_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->transformContext->show(3);
-    action_point_line_surface_volume(3);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_symmetry_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(3);
+  //   action_point_line_surface_volume(3);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_extrude_translate_cb(Fl_Widget * w,
-                                                       void *data)
-  {
-    FlGui::instance()->transformContext->show(0, true);
-    action_point_line_surface_volume(4);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_extrude_translate_cb(Fl_Widget * w,
+  //                                                      void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(0, true);
+  //   action_point_line_surface_volume(4);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_extrude_rotate_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->transformContext->show(1, true);
-    action_point_line_surface_volume(5);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_extrude_rotate_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(1, true);
+  //   action_point_line_surface_volume(5);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_pipe_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->transformContext->show(-1, true);
-    action_point_line_surface_volume(12);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_pipe_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(-1, true);
+  //   action_point_line_surface_volume(12);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_delete_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->transformContext->show(6);
-    action_point_line_surface_volume(6);
-    FlGui::instance()->transformContext->hide();
-  }
+  // static void geometry_elementary_delete_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->transformContext->show(6);
+  //   action_point_line_surface_volume(6);
+  //   FlGui::instance()->transformContext->hide();
+  // }
 
-  static void geometry_elementary_boolean_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
-    FlGui::instance()->transformContext->show(4);
+  // static void geometry_elementary_boolean_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
+  //   FlGui::instance()->transformContext->show(4);
 
-    std::string mode((const char *)data);
-    bool selectObject = true;
-    std::vector<std::pair<int, int> > object, tool;
+  //   std::string mode((const char *)data);
+  //   bool selectObject = true;
+  //   std::vector<std::pair<int, int> > object, tool;
 
-    while(1) {
-      if(object.empty())
-        Msg::StatusGl("Select object\n"
-                      "[Press 'e' to end selection or 'q' to abort]");
-      else if(selectObject)
-        Msg::StatusGl(
-          "Select object\n"
-          "[Press 'e' to end selection, 'u' to undo last selection or "
-          "'q' to abort]");
-      else if(tool.empty())
-        Msg::StatusGl("Select tool\n"
-                      "[Press 'e' to end selection or 'q' to abort]");
-      else
-        Msg::StatusGl(
-          "Select tool\n"
-          "[Press 'e' to end selection, 'u' to undo last selection or "
-          "'q' to abort]");
+  //   while(1) {
+  //     if(object.empty())
+  //       Msg::StatusGl("Select object\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]");
+  //     else if(selectObject)
+  //       Msg::StatusGl(
+  //         "Select object\n"
+  //         "[Press 'e' to end selection, 'u' to undo last selection or "
+  //         "'q' to abort]");
+  //     else if(tool.empty())
+  //       Msg::StatusGl("Select tool\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]");
+  //     else
+  //       Msg::StatusGl(
+  //         "Select tool\n"
+  //         "[Press 'e' to end selection, 'u' to undo last selection or "
+  //         "'q' to abort]");
 
-      int type = ENT_ALL;
-      switch(FlGui::instance()->transformContext->choice->value()) {
-      case 1: type = ENT_POINT; break;
-      case 2: type = ENT_CURVE; break;
-      case 3: type = ENT_SURFACE; break;
-      case 4: type = ENT_VOLUME; break;
-      }
+  //     int type = ENT_ALL;
+  //     switch(FlGui::instance()->transformContext->choice->value()) {
+  //     case 1: type = ENT_POINT; break;
+  //     case 2: type = ENT_CURVE; break;
+  //     case 3: type = ENT_SURFACE; break;
+  //     case 4: type = ENT_VOLUME; break;
+  //     }
 
-      char ib = FlGui::instance()->selectEntity(type);
-      if(ib == 'l') {
-        for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-            i++) {
-          if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
-            FlGui::instance()->selectedEdges[i]->setSelection(1);
-            std::pair<int, int> t(1,
-                                  FlGui::instance()->selectedEdges[i]->tag());
-            if(selectObject)
-              object.push_back(t);
-            else
-              tool.push_back(t);
-          }
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
-            i++) {
-          if(FlGui::instance()->selectedFaces[i]->getSelection() != 1) {
-            FlGui::instance()->selectedFaces[i]->setSelection(1);
-            std::pair<int, int> t(2,
-                                  FlGui::instance()->selectedFaces[i]->tag());
-            if(selectObject)
-              object.push_back(t);
-            else
-              tool.push_back(t);
-          }
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
-            i++) {
-          if(FlGui::instance()->selectedRegions[i]->getSelection() != 1) {
-            FlGui::instance()->selectedRegions[i]->setSelection(1);
-            std::pair<int, int> t(3,
-                                  FlGui::instance()->selectedRegions[i]->tag());
-            if(selectObject)
-              object.push_back(t);
-            else
-              tool.push_back(t);
-          }
-        }
-      }
-      if(ib == 'r') {
-        Msg::Warning(
-          "Entity de-selection not supported yet during boolean operation");
-      }
-      if(ib == 'u') {
-        if(selectObject && object.size()) {
-          std::pair<int, int> t = object.back();
-          GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
-          if(ge) ge->setSelection(0);
-          object.pop_back();
-        }
-        else if(tool.size()) {
-          std::pair<int, int> t = tool.back();
-          GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
-          if(ge) ge->setSelection(0);
-          tool.pop_back();
-        }
-      }
-      if(ib == 'e') {
-        if(selectObject) {
-          if(object.empty())
-            Msg::Error("At least one object must be selected");
-          else
-            selectObject = false;
-        }
-        else if(tool.empty() && mode != "BooleanFragments") {
-          Msg::Error("At least one tool must be selected");
-        }
-        else {
-          apply_boolean(
-            GModel::current()->getFileName(), mode, object, tool,
-            FlGui::instance()->transformContext->butt[4]->value(),
-            tool.size() ?
-              FlGui::instance()->transformContext->butt[5]->value() :
-              0);
-          GModel::current()->setSelection(0);
-          selectObject = true;
-          object.clear();
-          tool.clear();
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        break;
-      }
-    }
+  //     char ib = FlGui::instance()->selectEntity(type);
+  //     if(ib == 'l') {
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //           i++) {
+  //         if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
+  //           FlGui::instance()->selectedEdges[i]->setSelection(1);
+  //           std::pair<int, int> t(1,
+  //                                 FlGui::instance()->selectedEdges[i]->tag());
+  //           if(selectObject)
+  //             object.push_back(t);
+  //           else
+  //             tool.push_back(t);
+  //         }
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
+  //           i++) {
+  //         if(FlGui::instance()->selectedFaces[i]->getSelection() != 1) {
+  //           FlGui::instance()->selectedFaces[i]->setSelection(1);
+  //           std::pair<int, int> t(2,
+  //                                 FlGui::instance()->selectedFaces[i]->tag());
+  //           if(selectObject)
+  //             object.push_back(t);
+  //           else
+  //             tool.push_back(t);
+  //         }
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
+  //           i++) {
+  //         if(FlGui::instance()->selectedRegions[i]->getSelection() != 1) {
+  //           FlGui::instance()->selectedRegions[i]->setSelection(1);
+  //           std::pair<int, int> t(3,
+  //                                 FlGui::instance()->selectedRegions[i]->tag());
+  //           if(selectObject)
+  //             object.push_back(t);
+  //           else
+  //             tool.push_back(t);
+  //         }
+  //       }
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning(
+  //         "Entity de-selection not supported yet during boolean operation");
+  //     }
+  //     if(ib == 'u') {
+  //       if(selectObject && object.size()) {
+  //         std::pair<int, int> t = object.back();
+  //         GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
+  //         if(ge) ge->setSelection(0);
+  //         object.pop_back();
+  //       }
+  //       else if(tool.size()) {
+  //         std::pair<int, int> t = tool.back();
+  //         GEntity *ge = GModel::current()->getEntityByTag(t.first, t.second);
+  //         if(ge) ge->setSelection(0);
+  //         tool.pop_back();
+  //       }
+  //     }
+  //     if(ib == 'e') {
+  //       if(selectObject) {
+  //         if(object.empty())
+  //           Msg::Error("At least one object must be selected");
+  //         else
+  //           selectObject = false;
+  //       }
+  //       else if(tool.empty() && mode != "BooleanFragments") {
+  //         Msg::Error("At least one tool must be selected");
+  //       }
+  //       else {
+  //         apply_boolean(
+  //           GModel::current()->getFileName(), mode, object, tool,
+  //           FlGui::instance()->transformContext->butt[4]->value(),
+  //           tool.size() ?
+  //             FlGui::instance()->transformContext->butt[5]->value() :
+  //             0);
+  //         GModel::current()->setSelection(0);
+  //         selectObject = true;
+  //         object.clear();
+  //         tool.clear();
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       break;
+  //     }
+  //   }
 
-    FlGui::instance()->transformContext->hide();
-    drawContext::global()->draw();
-    Msg::StatusGl("");
-  }
+  //   FlGui::instance()->transformContext->hide();
+  //   drawContext::global()->draw();
+  //   Msg::StatusGl("");
+  // }
 
-  static void geometry_elementary_fillet_cb(Fl_Widget * w, void *data)
-  {
-    opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1);
-    opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  // static void geometry_elementary_fillet_cb(Fl_Widget * w, void *data)
+  // {
+  //   opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1);
+  //   opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
 
-    FlGui::instance()->transformContext->show(5, false, false);
+  //   FlGui::instance()->transformContext->show(5, false, false);
 
-    bool selectRegions = true;
-    std::vector<int> regions, edges;
+  //   bool selectRegions = true;
+  //   std::vector<int> regions, edges;
 
-    while(1) {
-      if(regions.empty())
-        Msg::StatusGl("Select volume\n"
-                      "[Press 'e' to end selection or 'q' to abort]");
-      else if(selectRegions)
-        Msg::StatusGl(
-          "Select volume\n"
-          "[Press 'e' to end selection, 'u' to undo last selection or "
-          "'q' to abort]");
-      else if(edges.empty())
-        Msg::StatusGl("Select curve\n"
-                      "[Press 'e' to end selection or 'q' to abort]");
-      else
-        Msg::StatusGl(
-          "Select curve\n"
-          "[Press 'e' to end selection, 'u' to undo last selection or "
-          "'q' to abort]");
+  //   while(1) {
+  //     if(regions.empty())
+  //       Msg::StatusGl("Select volume\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]");
+  //     else if(selectRegions)
+  //       Msg::StatusGl(
+  //         "Select volume\n"
+  //         "[Press 'e' to end selection, 'u' to undo last selection or "
+  //         "'q' to abort]");
+  //     else if(edges.empty())
+  //       Msg::StatusGl("Select curve\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]");
+  //     else
+  //       Msg::StatusGl(
+  //         "Select curve\n"
+  //         "[Press 'e' to end selection, 'u' to undo last selection or "
+  //         "'q' to abort]");
 
-      char ib =
-        FlGui::instance()->selectEntity(selectRegions ? ENT_VOLUME : ENT_CURVE);
-      if(ib == 'l') {
-        for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-            i++) {
-          if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
-            FlGui::instance()->selectedEdges[i]->setSelection(1);
-            edges.push_back(FlGui::instance()->selectedEdges[i]->tag());
-          }
-        }
-        for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
-            i++) {
-          if(FlGui::instance()->selectedRegions[i]->getSelection() != 1) {
-            FlGui::instance()->selectedRegions[i]->setSelection(1);
-            regions.push_back(FlGui::instance()->selectedRegions[i]->tag());
-          }
-        }
-      }
-      if(ib == 'r') {
-        Msg::Warning(
-          "Entity de-selection not supported yet during boolean operation");
-      }
-      if(ib == 'u') {
-        if(selectRegions && regions.size()) {
-          GRegion *ge = GModel::current()->getRegionByTag(regions.back());
-          if(ge) ge->setSelection(0);
-          regions.pop_back();
-        }
-        else if(edges.size()) {
-          GEdge *ge = GModel::current()->getEdgeByTag(edges.back());
-          if(ge) ge->setSelection(0);
-          edges.pop_back();
-        }
-      }
-      if(ib == 'e') {
-        if(selectRegions) {
-          if(regions.empty())
-            Msg::Error("At least one volume must be selected");
-          else
-            selectRegions = false;
-        }
-        else if(edges.empty()) {
-          Msg::Error("At least one curve must be selected");
-        }
-        else {
-          apply_fillet(GModel::current()->getFileName(), regions, edges,
-                       FlGui::instance()->transformContext->input[20]->value());
-          GModel::current()->setSelection(0);
-          selectRegions = true;
-          regions.clear();
-          edges.clear();
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        break;
-      }
-    }
+  //     char ib =
+  //       FlGui::instance()->selectEntity(selectRegions ? ENT_VOLUME : ENT_CURVE);
+  //     if(ib == 'l') {
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //           i++) {
+  //         if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
+  //           FlGui::instance()->selectedEdges[i]->setSelection(1);
+  //           edges.push_back(FlGui::instance()->selectedEdges[i]->tag());
+  //         }
+  //       }
+  //       for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
+  //           i++) {
+  //         if(FlGui::instance()->selectedRegions[i]->getSelection() != 1) {
+  //           FlGui::instance()->selectedRegions[i]->setSelection(1);
+  //           regions.push_back(FlGui::instance()->selectedRegions[i]->tag());
+  //         }
+  //       }
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning(
+  //         "Entity de-selection not supported yet during boolean operation");
+  //     }
+  //     if(ib == 'u') {
+  //       if(selectRegions && regions.size()) {
+  //         GRegion *ge = GModel::current()->getRegionByTag(regions.back());
+  //         if(ge) ge->setSelection(0);
+  //         regions.pop_back();
+  //       }
+  //       else if(edges.size()) {
+  //         GEdge *ge = GModel::current()->getEdgeByTag(edges.back());
+  //         if(ge) ge->setSelection(0);
+  //         edges.pop_back();
+  //       }
+  //     }
+  //     if(ib == 'e') {
+  //       if(selectRegions) {
+  //         if(regions.empty())
+  //           Msg::Error("At least one volume must be selected");
+  //         else
+  //           selectRegions = false;
+  //       }
+  //       else if(edges.empty()) {
+  //         Msg::Error("At least one curve must be selected");
+  //       }
+  //       else {
+  //         apply_fillet(GModel::current()->getFileName(), regions, edges,
+  //                      FlGui::instance()->transformContext->input[20]->value());
+  //         GModel::current()->setSelection(0);
+  //         selectRegions = true;
+  //         regions.clear();
+  //         edges.clear();
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       break;
+  //     }
+  //   }
 
-    FlGui::instance()->transformContext->hide();
-    drawContext::global()->draw();
-    Msg::StatusGl("");
-  }
+  //   FlGui::instance()->transformContext->hide();
+  //   drawContext::global()->draw();
+  //   Msg::StatusGl("");
+  // }
 
-  static void geometry_elementary_split_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
-    opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-    drawContext::global()->draw();
-    Msg::StatusGl("Select curve to split\n"
-                  "[Press 'q' to abort]");
-    GEdge *edge_to_split = 0;
-    while(1) {
-      char ib = FlGui::instance()->selectEntity(ENT_CURVE);
-      if(ib == 'q') break;
-      if(!FlGui::instance()->selectedEdges.empty()) {
-        edge_to_split = FlGui::instance()->selectedEdges[0];
-        edge_to_split->setSelection(1);
-        break;
-      }
-    }
-    Msg::StatusGl("");
-    if(FlGui::instance()->selectedEdges.empty()) return;
-    List_T *List1 = List_Create(5, 5, sizeof(int));
-    Msg::StatusGl("Select break points\n"
-                  "[Press 'e' to end selection or 'q' to abort]");
-    opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    drawContext::global()->draw();
-    while(1) {
-      char ib = FlGui::instance()->selectEntity(ENT_POINT);
-      if(ib == 'q') break;
-      if(ib == 'e' && edge_to_split) {
-        split_edge(edge_to_split->tag(), List1,
-                   GModel::current()->getFileName());
-        break;
-      }
-      for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
-          i++) {
-        int tag = FlGui::instance()->selectedVertices[i]->tag();
-        int index = List_ISearchSeq(List1, &tag, fcmp_int);
-        if(index < 0) List_Add(List1, &tag);
-        FlGui::instance()->selectedVertices[i]->setSelection(1);
-      }
-    }
-    Msg::StatusGl("");
-    FlGui::instance()->resetVisibility();
-    GModel::current()->setSelection(0);
-    drawContext::global()->draw();
-  }
+  // static void geometry_elementary_split_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
+  //   opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //   drawContext::global()->draw();
+  //   Msg::StatusGl("Select curve to split\n"
+  //                 "[Press 'q' to abort]");
+  //   GEdge *edge_to_split = 0;
+  //   while(1) {
+  //     char ib = FlGui::instance()->selectEntity(ENT_CURVE);
+  //     if(ib == 'q') break;
+  //     if(!FlGui::instance()->selectedEdges.empty()) {
+  //       edge_to_split = FlGui::instance()->selectedEdges[0];
+  //       edge_to_split->setSelection(1);
+  //       break;
+  //     }
+  //   }
+  //   Msg::StatusGl("");
+  //   if(FlGui::instance()->selectedEdges.empty()) return;
+  //   List_T *List1 = List_Create(5, 5, sizeof(int));
+  //   Msg::StatusGl("Select break points\n"
+  //                 "[Press 'e' to end selection or 'q' to abort]");
+  //   opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   drawContext::global()->draw();
+  //   while(1) {
+  //     char ib = FlGui::instance()->selectEntity(ENT_POINT);
+  //     if(ib == 'q') break;
+  //     if(ib == 'e' && edge_to_split) {
+  //       split_edge(edge_to_split->tag(), List1,
+  //                  GModel::current()->getFileName());
+  //       break;
+  //     }
+  //     for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
+  //         i++) {
+  //       int tag = FlGui::instance()->selectedVertices[i]->tag();
+  //       int index = List_ISearchSeq(List1, &tag, fcmp_int);
+  //       if(index < 0) List_Add(List1, &tag);
+  //       FlGui::instance()->selectedVertices[i]->setSelection(1);
+  //     }
+  //   }
+  //   Msg::StatusGl("");
+  //   FlGui::instance()->resetVisibility();
+  //   GModel::current()->setSelection(0);
+  //   drawContext::global()->draw();
+  // }
 
-  static void geometry_elementary_coherence_cb(Fl_Widget * w, void *data)
-  {
-    coherence(GModel::current()->getFileName());
-  }
+  // static void geometry_elementary_coherence_cb(Fl_Widget * w, void *data)
+  // {
+  //   coherence(GModel::current()->getFileName());
+  // }
 
-  static void geometry_physical_add_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
-    std::string str((const char *)data);
-    if(str == "Point")
-      FlGui::instance()->callForSolverPlugin(0);
-    else if(str == "Curve")
-      FlGui::instance()->callForSolverPlugin(1);
-    FlGui::instance()->physicalContext->show(false);
-    action_point_line_surface_volume(7, str);
-    FlGui::instance()->physicalContext->hide();
-  }
+  // static void geometry_physical_add_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
+  //   std::string str((const char *)data);
+  //   if(str == "Point")
+  //     FlGui::instance()->callForSolverPlugin(0);
+  //   else if(str == "Curve")
+  //     FlGui::instance()->callForSolverPlugin(1);
+  //   FlGui::instance()->physicalContext->show(false);
+  //   action_point_line_surface_volume(7, str);
+  //   FlGui::instance()->physicalContext->hide();
+  // }
 
-  static void geometry_physical_remove_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
-    std::string str((const char *)data);
-    FlGui::instance()->physicalContext->show(true);
-    action_point_line_surface_volume(11, str);
-    FlGui::instance()->physicalContext->hide();
-  }
+  // static void geometry_physical_remove_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
+  //   std::string str((const char *)data);
+  //   FlGui::instance()->physicalContext->show(true);
+  //   action_point_line_surface_volume(11, str);
+  //   FlGui::instance()->physicalContext->hide();
+  // }
 
   void mesh_save_cb(Fl_Widget * w, void *data)
   {
@@ -2225,592 +2253,592 @@ static void file_open_grd(Fl_Widget * w, void *data)
     drawContext::global()->draw();
   }
 
-  static void mesh_delete_parts_cb(Fl_Widget * w, void *data)
-  {
-    const char *str = (const char *)data;
-    int what;
+  // static void mesh_delete_parts_cb(Fl_Widget * w, void *data)
+  // {
+  //   const char *str = (const char *)data;
+  //   int what;
 
-    if(!strcmp(str, "elements")) {
-      CTX::instance()->pickElements = 1;
-      what = ENT_ALL;
-    }
-    else if(!strcmp(str, "curves")) {
-      CTX::instance()->pickElements = 0;
-      what = ENT_CURVE;
-    }
-    else if(!strcmp(str, "surfaces")) {
-      CTX::instance()->pickElements = 0;
-      what = ENT_SURFACE;
-    }
-    else if(!strcmp(str, "volumes")) {
-      CTX::instance()->pickElements = 0;
-      what = ENT_VOLUME;
-    }
-    else
-      return;
+  //   if(!strcmp(str, "elements")) {
+  //     CTX::instance()->pickElements = 1;
+  //     what = ENT_ALL;
+  //   }
+  //   else if(!strcmp(str, "curves")) {
+  //     CTX::instance()->pickElements = 0;
+  //     what = ENT_CURVE;
+  //   }
+  //   else if(!strcmp(str, "surfaces")) {
+  //     CTX::instance()->pickElements = 0;
+  //     what = ENT_SURFACE;
+  //   }
+  //   else if(!strcmp(str, "volumes")) {
+  //     CTX::instance()->pickElements = 0;
+  //     what = ENT_VOLUME;
+  //   }
+  //   else
+  //     return;
 
-    std::vector<MElement *> ele;
-    std::vector<GEntity *> ent;
+  //   std::vector<MElement *> ele;
+  //   std::vector<GEntity *> ent;
 
-    while(1) {
-      CTX::instance()->mesh.changed = ENT_ALL;
-      drawContext::global()->draw();
+  //   while(1) {
+  //     CTX::instance()->mesh.changed = ENT_ALL;
+  //     drawContext::global()->draw();
 
-      if(ele.size() || ent.size())
-        Msg::StatusGl(
-          "Select %s\n"
-          "[Press 'e' to end selection, 'u' to undo last selection or "
-          "'q' to abort]",
-          str);
-      else
-        Msg::StatusGl("Select %s\n"
-                      "[Press 'e' to end selection or 'q' to abort]",
-                      str);
+  //     if(ele.size() || ent.size())
+  //       Msg::StatusGl(
+  //         "Select %s\n"
+  //         "[Press 'e' to end selection, 'u' to undo last selection or "
+  //         "'q' to abort]",
+  //         str);
+  //     else
+  //       Msg::StatusGl("Select %s\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]",
+  //                     str);
 
-      char ib = FlGui::instance()->selectEntity(what);
-      if(ib == 'l') {
-        if(CTX::instance()->pickElements) {
-          for(std::size_t i = 0; i < FlGui::instance()->selectedElements.size();
-              i++) {
-            if(FlGui::instance()->selectedElements[i]->getVisibility() != 2) {
-              FlGui::instance()->selectedElements[i]->setVisibility(2);
-              ele.push_back(FlGui::instance()->selectedElements[i]);
-            }
-          }
-        }
-        else {
-          for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-              i++) {
-            if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
-              FlGui::instance()->selectedEdges[i]->setSelection(1);
-              ent.push_back(FlGui::instance()->selectedEdges[i]);
-            }
-          }
-          for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
-              i++) {
-            if(FlGui::instance()->selectedFaces[i]->getSelection() != 1) {
-              FlGui::instance()->selectedFaces[i]->setSelection(1);
-              ent.push_back(FlGui::instance()->selectedFaces[i]);
-            }
-          }
-          for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
-              i++) {
-            if(FlGui::instance()->selectedRegions[i]->getSelection() != 1) {
-              FlGui::instance()->selectedRegions[i]->setSelection(1);
-              ent.push_back(FlGui::instance()->selectedRegions[i]);
-            }
-          }
-        }
-      }
-      if(ib == 'r') {
-        if(CTX::instance()->pickElements) {
-          for(std::size_t i = 0; i < FlGui::instance()->selectedElements.size();
-              i++)
-            FlGui::instance()->selectedElements[i]->setVisibility(1);
-        }
-        else {
-          for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-              i++)
-            FlGui::instance()->selectedEdges[i]->setSelection(0);
-          for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
-              i++)
-            FlGui::instance()->selectedFaces[i]->setSelection(0);
-          for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
-              i++)
-            FlGui::instance()->selectedRegions[i]->setSelection(0);
-        }
-      }
-      if(ib == 'u') {
-        if(CTX::instance()->pickElements) {
-          if(ele.size()) {
-            ele[ele.size() - 1]->setVisibility(1);
-            ele.pop_back();
-          }
-        }
-        else {
-          if(ent.size()) {
-            ent[ent.size() - 1]->setSelection(0);
-            ent.pop_back();
-          }
-        }
-      }
-      if(ib == 'e') {
-        if(CTX::instance()->pickElements) {
-          for(std::size_t i = 0; i < ele.size(); i++)
-            if(ele[i]->getVisibility() == 2) ele[i]->setVisibility(0);
-        }
-        else {
-          for(std::size_t i = 0; i < ent.size(); i++)
-            if(ent[i]->getSelection() == 1) ent[i]->setVisibility(0);
-        }
-        GModel::current()->removeInvisibleElements();
-        ele.clear();
-        ent.clear();
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        break;
-      }
-    }
+  //     char ib = FlGui::instance()->selectEntity(what);
+  //     if(ib == 'l') {
+  //       if(CTX::instance()->pickElements) {
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedElements.size();
+  //             i++) {
+  //           if(FlGui::instance()->selectedElements[i]->getVisibility() != 2) {
+  //             FlGui::instance()->selectedElements[i]->setVisibility(2);
+  //             ele.push_back(FlGui::instance()->selectedElements[i]);
+  //           }
+  //         }
+  //       }
+  //       else {
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //             i++) {
+  //           if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
+  //             FlGui::instance()->selectedEdges[i]->setSelection(1);
+  //             ent.push_back(FlGui::instance()->selectedEdges[i]);
+  //           }
+  //         }
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
+  //             i++) {
+  //           if(FlGui::instance()->selectedFaces[i]->getSelection() != 1) {
+  //             FlGui::instance()->selectedFaces[i]->setSelection(1);
+  //             ent.push_back(FlGui::instance()->selectedFaces[i]);
+  //           }
+  //         }
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
+  //             i++) {
+  //           if(FlGui::instance()->selectedRegions[i]->getSelection() != 1) {
+  //             FlGui::instance()->selectedRegions[i]->setSelection(1);
+  //             ent.push_back(FlGui::instance()->selectedRegions[i]);
+  //           }
+  //         }
+  //       }
+  //     }
+  //     if(ib == 'r') {
+  //       if(CTX::instance()->pickElements) {
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedElements.size();
+  //             i++)
+  //           FlGui::instance()->selectedElements[i]->setVisibility(1);
+  //       }
+  //       else {
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //             i++)
+  //           FlGui::instance()->selectedEdges[i]->setSelection(0);
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
+  //             i++)
+  //           FlGui::instance()->selectedFaces[i]->setSelection(0);
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedRegions.size();
+  //             i++)
+  //           FlGui::instance()->selectedRegions[i]->setSelection(0);
+  //       }
+  //     }
+  //     if(ib == 'u') {
+  //       if(CTX::instance()->pickElements) {
+  //         if(ele.size()) {
+  //           ele[ele.size() - 1]->setVisibility(1);
+  //           ele.pop_back();
+  //         }
+  //       }
+  //       else {
+  //         if(ent.size()) {
+  //           ent[ent.size() - 1]->setSelection(0);
+  //           ent.pop_back();
+  //         }
+  //       }
+  //     }
+  //     if(ib == 'e') {
+  //       if(CTX::instance()->pickElements) {
+  //         for(std::size_t i = 0; i < ele.size(); i++)
+  //           if(ele[i]->getVisibility() == 2) ele[i]->setVisibility(0);
+  //       }
+  //       else {
+  //         for(std::size_t i = 0; i < ent.size(); i++)
+  //           if(ent[i]->getSelection() == 1) ent[i]->setVisibility(0);
+  //       }
+  //       GModel::current()->removeInvisibleElements();
+  //       ele.clear();
+  //       ent.clear();
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       break;
+  //     }
+  //   }
 
-    CTX::instance()->mesh.changed = ENT_ALL;
-    CTX::instance()->pickElements = 0;
-    drawContext::global()->draw();
-    Msg::StatusGl("");
-  }
+  //   CTX::instance()->mesh.changed = ENT_ALL;
+  //   CTX::instance()->pickElements = 0;
+  //   drawContext::global()->draw();
+  //   Msg::StatusGl("");
+  // }
 
-  static void mesh_inspect_cb(Fl_Widget * w, void *data)
-  {
-    CTX::instance()->pickElements = 1;
-    CTX::instance()->mesh.changed = ENT_ALL;
-    drawContext::global()->draw();
+  // static void mesh_inspect_cb(Fl_Widget * w, void *data)
+  // {
+  //   CTX::instance()->pickElements = 1;
+  //   CTX::instance()->mesh.changed = ENT_ALL;
+  //   drawContext::global()->draw();
 
-    while(1) {
-      Msg::StatusGl("Select element\n[Press 'q' to abort]");
-      char ib = FlGui::instance()->selectEntity(ENT_ALL);
-      if(ib == 'l') {
-        if(FlGui::instance()->selectedElements.size()) {
-          MElement *ele = FlGui::instance()->selectedElements[0];
-          GModel::current()->setSelection(0);
-          ele->setVisibility(2);
-          CTX::instance()->mesh.changed = ENT_ALL;
-          drawContext::global()->draw();
-          std::vector<std::string> info =
-            SplitString(ele->getInfoString(true), '\n');
-          for(std::size_t i = 0; i < info.size(); i++)
-            Msg::Direct("%s", info[i].c_str());
-          if(CTX::instance()->tooltips) {
-            std::string str;
-            for(std::size_t i = 0; i < info.size(); i++) str += info[i] + "\n";
-            FlGui::instance()->getCurrentOpenglWindow()->drawTooltip(str);
-          }
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        break;
-      }
-    }
+  //   while(1) {
+  //     Msg::StatusGl("Select element\n[Press 'q' to abort]");
+  //     char ib = FlGui::instance()->selectEntity(ENT_ALL);
+  //     if(ib == 'l') {
+  //       if(FlGui::instance()->selectedElements.size()) {
+  //         MElement *ele = FlGui::instance()->selectedElements[0];
+  //         GModel::current()->setSelection(0);
+  //         ele->setVisibility(2);
+  //         CTX::instance()->mesh.changed = ENT_ALL;
+  //         drawContext::global()->draw();
+  //         std::vector<std::string> info =
+  //           SplitString(ele->getInfoString(true), '\n');
+  //         for(std::size_t i = 0; i < info.size(); i++)
+  //           Msg::Direct("%s", info[i].c_str());
+  //         if(CTX::instance()->tooltips) {
+  //           std::string str;
+  //           for(std::size_t i = 0; i < info.size(); i++) str += info[i] + "\n";
+  //           FlGui::instance()->getCurrentOpenglWindow()->drawTooltip(str);
+  //         }
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       break;
+  //     }
+  //   }
 
-    CTX::instance()->pickElements = 0;
-    CTX::instance()->mesh.changed = ENT_ALL;
-    drawContext::global()->draw();
-    Msg::StatusGl("");
-  }
+  //   CTX::instance()->pickElements = 0;
+  //   CTX::instance()->mesh.changed = ENT_ALL;
+  //   drawContext::global()->draw();
+  //   Msg::StatusGl("");
+  // }
 
-  static void mesh_degree_cb(Fl_Widget * w, void *data)
-  {
-    int degree = (intptr_t)data;
-    GModel::current()->setOrderN(degree,
-                                 CTX::instance()->mesh.secondOrderLinear,
-                                 CTX::instance()->mesh.secondOrderIncomplete);
-    drawContext::global()->draw();
-  }
+  // static void mesh_degree_cb(Fl_Widget * w, void *data)
+  // {
+  //   int degree = (intptr_t)data;
+  //   GModel::current()->setOrderN(degree,
+  //                                CTX::instance()->mesh.secondOrderLinear,
+  //                                CTX::instance()->mesh.secondOrderIncomplete);
+  //   drawContext::global()->draw();
+  // }
 
-  static void mesh_optimize_cb(Fl_Widget * w, void *data)
-  {
-    if(CTX::instance()->lock) {
-      Msg::Info("I'm busy! Ask me that later...");
-      return;
-    }
-    CTX::instance()->lock = 1;
-    GModel::current()->optimizeMesh("");
-    CTX::instance()->lock = 0;
-    drawContext::global()->draw();
-  }
+  // static void mesh_optimize_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(CTX::instance()->lock) {
+  //     Msg::Info("I'm busy! Ask me that later...");
+  //     return;
+  //   }
+  //   CTX::instance()->lock = 1;
+  //   GModel::current()->optimizeMesh("");
+  //   CTX::instance()->lock = 0;
+  //   drawContext::global()->draw();
+  // }
 
-  static void mesh_cross_compute_cb(Fl_Widget * w, void *data)
-  {
-    computeCrossField(GModel::current());
-    drawContext::global()->draw();
-  }
+  // static void mesh_cross_compute_cb(Fl_Widget * w, void *data)
+  // {
+  //   computeCrossField(GModel::current());
+  //   drawContext::global()->draw();
+  // }
 
-  static void mesh_refine_cb(Fl_Widget * w, void *data)
-  {
-    GModel::current()->refineMesh(CTX::instance()->mesh.secondOrderLinear);
-    drawContext::global()->draw();
-  }
+  // static void mesh_refine_cb(Fl_Widget * w, void *data)
+  // {
+  //   GModel::current()->refineMesh(CTX::instance()->mesh.secondOrderLinear);
+  //   drawContext::global()->draw();
+  // }
 
-  static void mesh_smooth_cb(Fl_Widget * w, void *data)
-  {
-    GModel::current()->smoothMesh();
-    drawContext::global()->draw();
-  }
+  // static void mesh_smooth_cb(Fl_Widget * w, void *data)
+  // {
+  //   GModel::current()->smoothMesh();
+  //   drawContext::global()->draw();
+  // }
 
-  static void mesh_recombine_cb(Fl_Widget * w, void *data)
-  {
-    GModel::current()->recombineMesh();
-    drawContext::global()->draw();
-  }
+  // static void mesh_recombine_cb(Fl_Widget * w, void *data)
+  // {
+  //   GModel::current()->recombineMesh();
+  //   drawContext::global()->draw();
+  // }
 
-#if defined(HAVE_NETGEN)
-  static void mesh_optimize_netgen_cb(Fl_Widget * w, void *data)
-  {
-    if(CTX::instance()->lock) {
-      Msg::Info("I'm busy! Ask me that later...");
-      return;
-    }
-    CTX::instance()->lock = 1;
-    GModel::current()->optimizeMesh("Netgen");
-    CTX::instance()->lock = 0;
-    drawContext::global()->draw();
-  }
-#endif
+// #if defined(HAVE_NETGEN)
+//   static void mesh_optimize_netgen_cb(Fl_Widget * w, void *data)
+//   {
+//     if(CTX::instance()->lock) {
+//       Msg::Info("I'm busy! Ask me that later...");
+//       return;
+//     }
+//     CTX::instance()->lock = 1;
+//     GModel::current()->optimizeMesh("Netgen");
+//     CTX::instance()->lock = 0;
+//     drawContext::global()->draw();
+//   }
+// #endif
 
-  static void mesh_partition_cb(Fl_Widget * w, void *data)
-  {
-    partition_dialog();
-  }
+  // static void mesh_partition_cb(Fl_Widget * w, void *data)
+  // {
+  //   partition_dialog();
+  // }
 
-  static void mesh_unpartition_cb(Fl_Widget * w, void *data)
-  {
-    int ier = GModel::current()->unpartitionMesh();
+  // static void mesh_unpartition_cb(Fl_Widget * w, void *data)
+  // {
+  //   int ier = GModel::current()->unpartitionMesh();
 
-    // Update the screen
-    if(!ier) {
-      opt_mesh_zone_definition(0, GMSH_SET, 0.);
-      opt_mesh_color_carousel(0, GMSH_SET | GMSH_GUI, 1.);
-      CTX::instance()->mesh.changed = ENT_ALL;
-      drawContext::global()->draw();
-    }
-  }
+  //   // Update the screen
+  //   if(!ier) {
+  //     opt_mesh_zone_definition(0, GMSH_SET, 0.);
+  //     opt_mesh_color_carousel(0, GMSH_SET | GMSH_GUI, 1.);
+  //     CTX::instance()->mesh.changed = ENT_ALL;
+  //     drawContext::global()->draw();
+  //   }
+  // }
 
-  static void mesh_convert_old_partitioning_cb(Fl_Widget * w, void *data)
-  {
-    int ier = GModel::current()->convertOldPartitioningToNewOne();
+  // static void mesh_convert_old_partitioning_cb(Fl_Widget * w, void *data)
+  // {
+  //   int ier = GModel::current()->convertOldPartitioningToNewOne();
 
-    // Update the screen
-    if(!ier) {
-      opt_mesh_zone_definition(0, GMSH_SET, 0.);
-      opt_mesh_color_carousel(0, GMSH_SET | GMSH_GUI, 1.);
-      CTX::instance()->mesh.changed = ENT_ALL;
-      drawContext::global()->draw();
-    }
-  }
+  //   // Update the screen
+  //   if(!ier) {
+  //     opt_mesh_zone_definition(0, GMSH_SET, 0.);
+  //     opt_mesh_color_carousel(0, GMSH_SET | GMSH_GUI, 1.);
+  //     CTX::instance()->mesh.changed = ENT_ALL;
+  //     drawContext::global()->draw();
+  //   }
+  // }
 
-  static void mesh_define_length_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->meshContext->show(0);
-    action_point_line_surface_volume(8, "Point");
-    FlGui::instance()->meshContext->hide();
-  }
+  // static void mesh_define_length_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->meshContext->show(0);
+  //   action_point_line_surface_volume(8, "Point");
+  //   FlGui::instance()->meshContext->hide();
+  // }
 
-  static void mesh_define_recombine_cb(Fl_Widget * w, void *data)
-  {
-    action_point_line_surface_volume(9, "Surface");
-  }
+  // static void mesh_define_recombine_cb(Fl_Widget * w, void *data)
+  // {
+  //   action_point_line_surface_volume(9, "Surface");
+  // }
 
-  static void mesh_define_transfinite(int dim)
-  {
-    opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    switch(dim) {
-    case 1: opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1); break;
-    case 2: opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1); break;
-    case 3: opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1); break;
-    }
-    drawContext::global()->draw();
+  // static void mesh_define_transfinite(int dim)
+  // {
+  //   opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   switch(dim) {
+  //   case 1: opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1); break;
+  //   case 2: opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1); break;
+  //   case 3: opt_geometry_volumes(0, GMSH_SET | GMSH_GUI, 1); break;
+  //   }
+  //   drawContext::global()->draw();
 
-    std::vector<int> p;
-    char ib;
-    while(1) {
-      switch(dim) {
-      case 1:
-        if(p.empty())
-          Msg::StatusGl("Select curves\n"
-                        "[Press 'e' to end selection or 'q' to abort]");
-        else
-          Msg::StatusGl(
-            "Select curves\n"
-            "[Press 'e' to end selection, 'u' to undo last selection "
-            "or 'q' to abort]");
-        ib = FlGui::instance()->selectEntity(ENT_CURVE);
-        break;
-      case 2:
-        Msg::StatusGl("Select surface\n[Press 'q' to abort]");
-        ib = FlGui::instance()->selectEntity(ENT_SURFACE);
-        break;
-      case 3:
-        Msg::StatusGl("Select volume\n[Press 'q' to abort]");
-        ib = FlGui::instance()->selectEntity(ENT_VOLUME);
-        break;
-      default: ib = 'l'; break;
-      }
+  //   std::vector<int> p;
+  //   char ib;
+  //   while(1) {
+  //     switch(dim) {
+  //     case 1:
+  //       if(p.empty())
+  //         Msg::StatusGl("Select curves\n"
+  //                       "[Press 'e' to end selection or 'q' to abort]");
+  //       else
+  //         Msg::StatusGl(
+  //           "Select curves\n"
+  //           "[Press 'e' to end selection, 'u' to undo last selection "
+  //           "or 'q' to abort]");
+  //       ib = FlGui::instance()->selectEntity(ENT_CURVE);
+  //       break;
+  //     case 2:
+  //       Msg::StatusGl("Select surface\n[Press 'q' to abort]");
+  //       ib = FlGui::instance()->selectEntity(ENT_SURFACE);
+  //       break;
+  //     case 3:
+  //       Msg::StatusGl("Select volume\n[Press 'q' to abort]");
+  //       ib = FlGui::instance()->selectEntity(ENT_VOLUME);
+  //       break;
+  //     default: ib = 'l'; break;
+  //     }
 
-      if(ib == 'e') {
-        if(dim == 1) {
-          if(p.size())
-            add_trsfline(p, GModel::current()->getFileName(),
-                         FlGui::instance()->meshContext->choice[0]->text(),
-                         FlGui::instance()->meshContext->input[2]->value(),
-                         FlGui::instance()->meshContext->input[1]->value());
-        }
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        p.clear();
-      }
-      if(ib == 'u') {
-        if(dim == 1) {
-          if(p.size()) {
-            GEdge *ge = GModel::current()->getEdgeByTag(p.back());
-            if(ge) ge->setSelection(0);
-            drawContext::global()->draw();
-            p.pop_back();
-          }
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        drawContext::global()->draw();
-        break;
-      }
-      if(ib == 'r') {
-        Msg::Warning("Entity de-selection not supported yet during "
-                     "transfinite definition");
-      }
-      if(ib == 'l') {
-        switch(dim) {
-        case 1:
-          for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-              i++) {
-            FlGui::instance()->selectedEdges[i]->setSelection(1);
-            p.push_back(FlGui::instance()->selectedEdges[i]->tag());
-          }
-          drawContext::global()->draw();
-          break;
-        case 2:
-        case 3:
-          if(dim == 2) {
-            FlGui::instance()->selectedFaces[0]->setSelection(1);
-            drawContext::global()->draw();
-            p.push_back(FlGui::instance()->selectedFaces[0]->tag());
-          }
-          else {
-            FlGui::instance()->selectedRegions[0]->setSelection(1);
-            drawContext::global()->draw();
-            p.push_back(FlGui::instance()->selectedRegions[0]->tag());
-          }
-          while(1) {
-            if(p.size() == 1)
-              Msg::StatusGl("Select (ordered) boundary points\n"
-                            "[Press 'e' to end selection or 'q' to abort]");
-            else
-              Msg::StatusGl(
-                "Select (ordered) boundary points\n"
-                "[Press 'e' to end selection, 'u' to undo last selection "
-                "or 'q' to abort]");
-            ib = FlGui::instance()->selectEntity(ENT_POINT);
-            if(ib == 'l') {
-              for(std::size_t i = 0;
-                  i < FlGui::instance()->selectedVertices.size(); i++) {
-                FlGui::instance()->selectedVertices[i]->setSelection(1);
-                p.push_back(FlGui::instance()->selectedVertices[i]->tag());
-                break;
-              }
-              drawContext::global()->draw();
-            }
-            if(ib == 'u') {
-              if(p.size() > 1) {
-                GVertex *gv = GModel::current()->getVertexByTag(p.back());
-                if(gv) gv->setSelection(0);
-                drawContext::global()->draw();
-                p.pop_back();
-              }
-            }
-            if(ib == 'r') {
-              Msg::Warning("Entity de-selection not supported yet during "
-                           "transfinite definition");
-            }
-            if(ib == 'e') {
-              switch(dim) {
-              case 2:
-                if((p.size() == 0 + 1 || p.size() == 3 + 1 ||
-                    p.size() == 4 + 1))
-                  add_trsfsurf(
-                    p, GModel::current()->getFileName(),
-                    FlGui::instance()->meshContext->choice[1]->text());
-                else
-                  Msg::Error("Wrong number of points for mesh constraint");
-                break;
-              case 3:
-                if(p.size() == 6 + 1 || p.size() == 8 + 1)
-                  add_trsfvol(p, GModel::current()->getFileName());
-                else
-                  Msg::Error("Wrong number of points for transfinite volume");
-                break;
-              }
-              GModel::current()->setSelection(0);
-              drawContext::global()->draw();
-              p.clear();
-              break;
-            }
-            if(ib == 'q') {
-              GModel::current()->setSelection(0);
-              drawContext::global()->draw();
-              goto stopall;
-            }
-          }
-          break;
-        }
-      }
-    }
+  //     if(ib == 'e') {
+  //       if(dim == 1) {
+  //         if(p.size())
+  //           add_trsfline(p, GModel::current()->getFileName(),
+  //                        FlGui::instance()->meshContext->choice[0]->text(),
+  //                        FlGui::instance()->meshContext->input[2]->value(),
+  //                        FlGui::instance()->meshContext->input[1]->value());
+  //       }
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       p.clear();
+  //     }
+  //     if(ib == 'u') {
+  //       if(dim == 1) {
+  //         if(p.size()) {
+  //           GEdge *ge = GModel::current()->getEdgeByTag(p.back());
+  //           if(ge) ge->setSelection(0);
+  //           drawContext::global()->draw();
+  //           p.pop_back();
+  //         }
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       drawContext::global()->draw();
+  //       break;
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning("Entity de-selection not supported yet during "
+  //                    "transfinite definition");
+  //     }
+  //     if(ib == 'l') {
+  //       switch(dim) {
+  //       case 1:
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //             i++) {
+  //           FlGui::instance()->selectedEdges[i]->setSelection(1);
+  //           p.push_back(FlGui::instance()->selectedEdges[i]->tag());
+  //         }
+  //         drawContext::global()->draw();
+  //         break;
+  //       case 2:
+  //       case 3:
+  //         if(dim == 2) {
+  //           FlGui::instance()->selectedFaces[0]->setSelection(1);
+  //           drawContext::global()->draw();
+  //           p.push_back(FlGui::instance()->selectedFaces[0]->tag());
+  //         }
+  //         else {
+  //           FlGui::instance()->selectedRegions[0]->setSelection(1);
+  //           drawContext::global()->draw();
+  //           p.push_back(FlGui::instance()->selectedRegions[0]->tag());
+  //         }
+  //         while(1) {
+  //           if(p.size() == 1)
+  //             Msg::StatusGl("Select (ordered) boundary points\n"
+  //                           "[Press 'e' to end selection or 'q' to abort]");
+  //           else
+  //             Msg::StatusGl(
+  //               "Select (ordered) boundary points\n"
+  //               "[Press 'e' to end selection, 'u' to undo last selection "
+  //               "or 'q' to abort]");
+  //           ib = FlGui::instance()->selectEntity(ENT_POINT);
+  //           if(ib == 'l') {
+  //             for(std::size_t i = 0;
+  //                 i < FlGui::instance()->selectedVertices.size(); i++) {
+  //               FlGui::instance()->selectedVertices[i]->setSelection(1);
+  //               p.push_back(FlGui::instance()->selectedVertices[i]->tag());
+  //               break;
+  //             }
+  //             drawContext::global()->draw();
+  //           }
+  //           if(ib == 'u') {
+  //             if(p.size() > 1) {
+  //               GVertex *gv = GModel::current()->getVertexByTag(p.back());
+  //               if(gv) gv->setSelection(0);
+  //               drawContext::global()->draw();
+  //               p.pop_back();
+  //             }
+  //           }
+  //           if(ib == 'r') {
+  //             Msg::Warning("Entity de-selection not supported yet during "
+  //                          "transfinite definition");
+  //           }
+  //           if(ib == 'e') {
+  //             switch(dim) {
+  //             case 2:
+  //               if((p.size() == 0 + 1 || p.size() == 3 + 1 ||
+  //                   p.size() == 4 + 1))
+  //                 add_trsfsurf(
+  //                   p, GModel::current()->getFileName(),
+  //                   FlGui::instance()->meshContext->choice[1]->text());
+  //               else
+  //                 Msg::Error("Wrong number of points for mesh constraint");
+  //               break;
+  //             case 3:
+  //               if(p.size() == 6 + 1 || p.size() == 8 + 1)
+  //                 add_trsfvol(p, GModel::current()->getFileName());
+  //               else
+  //                 Msg::Error("Wrong number of points for transfinite volume");
+  //               break;
+  //             }
+  //             GModel::current()->setSelection(0);
+  //             drawContext::global()->draw();
+  //             p.clear();
+  //             break;
+  //           }
+  //           if(ib == 'q') {
+  //             GModel::current()->setSelection(0);
+  //             drawContext::global()->draw();
+  //             goto stopall;
+  //           }
+  //         }
+  //         break;
+  //       }
+  //     }
+  //   }
 
-  stopall:
-    Msg::StatusGl("");
-  }
+  // stopall:
+  //   Msg::StatusGl("");
+  // }
 
-  static void mesh_define_transfinite_line_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->meshContext->show(1);
-    mesh_define_transfinite(1);
-    FlGui::instance()->meshContext->hide();
-  }
+  // static void mesh_define_transfinite_line_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->meshContext->show(1);
+  //   mesh_define_transfinite(1);
+  //   FlGui::instance()->meshContext->hide();
+  // }
 
-  static void mesh_define_transfinite_surface_cb(Fl_Widget * w, void *data)
-  {
-    FlGui::instance()->meshContext->show(2);
-    mesh_define_transfinite(2);
-    FlGui::instance()->meshContext->hide();
-  }
+  // static void mesh_define_transfinite_surface_cb(Fl_Widget * w, void *data)
+  // {
+  //   FlGui::instance()->meshContext->show(2);
+  //   mesh_define_transfinite(2);
+  //   FlGui::instance()->meshContext->hide();
+  // }
 
-  static void mesh_define_transfinite_volume_cb(Fl_Widget * w, void *data)
-  {
-    mesh_define_transfinite(3);
-  }
+  // static void mesh_define_transfinite_volume_cb(Fl_Widget * w, void *data)
+  // {
+  //   mesh_define_transfinite(3);
+  // }
 
-  static void mesh_define_embedded_cb(Fl_Widget * w, void *data)
-  {
-    if(!data) return;
-    std::string what((const char *)data);
-    std::vector<int> entities;
-    bool selectEntities = true;
+  // static void mesh_define_embedded_cb(Fl_Widget * w, void *data)
+  // {
+  //   if(!data) return;
+  //   std::string what((const char *)data);
+  //   std::vector<int> entities;
+  //   bool selectEntities = true;
 
-    int type;
-    const char *str = "";
-    if(what == "Surface") {
-      type = ENT_SURFACE;
-      str = "surfaces";
-      opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
-    }
-    else if(what == "Curve") {
-      type = ENT_CURVE;
-      str = "curves";
-      opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
-    }
-    else if(what == "Point") {
-      type = ENT_POINT;
-      str = "points";
-      opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
-    }
-    else {
-      Msg::Error("Unknown type of entity to embed: %s", what.c_str());
-      return;
-    }
-    while(1) {
-      if(entities.empty())
-        Msg::StatusGl("Select %s\n"
-                      "[Press 'e' to end selection or 'q' to abort]",
-                      str);
-      else if(selectEntities)
-        Msg::StatusGl(
-          "Select %s\n"
-          "[Press 'e' to end selection, 'u' to undo last selection or "
-          "'q' to abort]",
-          str);
-      else
-        Msg::StatusGl("Select entity in which to embed the %s\n"
-                      "[Press 'q' to abort]",
-                      str);
-      int t = type;
-      if(!selectEntities) {
-        switch(FlGui::instance()->transformContext->choice->value()) {
-        case 2: t = ENT_CURVE; break;
-        case 3: t = ENT_SURFACE; break;
-        case 4: t = ENT_VOLUME; break;
-        default: t = ENT_ALL; break;
-        }
-      }
-      char ib = FlGui::instance()->selectEntity(t);
-      if(ib == 'l') {
-        if(selectEntities && what == "Point") {
-          for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
-              i++) {
-            if(FlGui::instance()->selectedVertices[i]->getSelection() != 1) {
-              FlGui::instance()->selectedVertices[i]->setSelection(1);
-              entities.push_back(FlGui::instance()->selectedVertices[i]->tag());
-            }
-          }
-        }
-        else if(selectEntities && what == "Curve") {
-          for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
-              i++) {
-            if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
-              FlGui::instance()->selectedEdges[i]->setSelection(1);
-              entities.push_back(FlGui::instance()->selectedEdges[i]->tag());
-            }
-          }
-        }
-        else if(selectEntities && what == "Surface") {
-          for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
-              i++) {
-            if(FlGui::instance()->selectedFaces[i]->getSelection() != 1) {
-              FlGui::instance()->selectedFaces[i]->setSelection(1);
-              entities.push_back(FlGui::instance()->selectedFaces[i]->tag());
-            }
-          }
-        }
-        else if(!selectEntities &&
-                (FlGui::instance()->selectedFaces.size() ||
-                 FlGui::instance()->selectedRegions.size())) {
-          int dim = FlGui::instance()->selectedFaces.size() ? 2 : 3;
-          if(dim == 2)
-            FlGui::instance()->selectedFaces[0]->setSelection(1);
-          else
-            FlGui::instance()->selectedRegions[0]->setSelection(1);
-          drawContext::global()->draw();
-          int tag = (dim == 2) ? FlGui::instance()->selectedFaces[0]->tag() :
-                                 FlGui::instance()->selectedRegions[0]->tag();
-          add_embedded(GModel::current()->getFileName(), what, entities, dim,
-                       tag);
-          GModel::current()->setSelection(0);
-          selectEntities = true;
-          entities.clear();
-        }
-      }
-      if(ib == 'r') {
-        Msg::Warning(
-          "Entity de-selection not supported yet during boolean operation");
-      }
-      if(ib == 'u') {
-        if(selectEntities && entities.size()) {
-          int dim = (what == "Surface") ? 2 : (what == "Curve") ? 1 : 0;
-          GEntity *ge = GModel::current()->getEntityByTag(dim, entities.back());
-          if(ge) ge->setSelection(0);
-          entities.pop_back();
-        }
-      }
-      if(ib == 'e') {
-        if(selectEntities) {
-          if(entities.empty())
-            Msg::Error("At least one entity must be selected");
-          else
-            selectEntities = false;
-        }
-      }
-      if(ib == 'q') {
-        GModel::current()->setSelection(0);
-        break;
-      }
-    }
+  //   int type;
+  //   const char *str = "";
+  //   if(what == "Surface") {
+  //     type = ENT_SURFACE;
+  //     str = "surfaces";
+  //     opt_geometry_surfaces(0, GMSH_SET | GMSH_GUI, 1);
+  //   }
+  //   else if(what == "Curve") {
+  //     type = ENT_CURVE;
+  //     str = "curves";
+  //     opt_geometry_curves(0, GMSH_SET | GMSH_GUI, 1);
+  //   }
+  //   else if(what == "Point") {
+  //     type = ENT_POINT;
+  //     str = "points";
+  //     opt_geometry_points(0, GMSH_SET | GMSH_GUI, 1);
+  //   }
+  //   else {
+  //     Msg::Error("Unknown type of entity to embed: %s", what.c_str());
+  //     return;
+  //   }
+  //   while(1) {
+  //     if(entities.empty())
+  //       Msg::StatusGl("Select %s\n"
+  //                     "[Press 'e' to end selection or 'q' to abort]",
+  //                     str);
+  //     else if(selectEntities)
+  //       Msg::StatusGl(
+  //         "Select %s\n"
+  //         "[Press 'e' to end selection, 'u' to undo last selection or "
+  //         "'q' to abort]",
+  //         str);
+  //     else
+  //       Msg::StatusGl("Select entity in which to embed the %s\n"
+  //                     "[Press 'q' to abort]",
+  //                     str);
+  //     int t = type;
+  //     if(!selectEntities) {
+  //       switch(FlGui::instance()->transformContext->choice->value()) {
+  //       case 2: t = ENT_CURVE; break;
+  //       case 3: t = ENT_SURFACE; break;
+  //       case 4: t = ENT_VOLUME; break;
+  //       default: t = ENT_ALL; break;
+  //       }
+  //     }
+  //     char ib = FlGui::instance()->selectEntity(t);
+  //     if(ib == 'l') {
+  //       if(selectEntities && what == "Point") {
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedVertices.size();
+  //             i++) {
+  //           if(FlGui::instance()->selectedVertices[i]->getSelection() != 1) {
+  //             FlGui::instance()->selectedVertices[i]->setSelection(1);
+  //             entities.push_back(FlGui::instance()->selectedVertices[i]->tag());
+  //           }
+  //         }
+  //       }
+  //       else if(selectEntities && what == "Curve") {
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedEdges.size();
+  //             i++) {
+  //           if(FlGui::instance()->selectedEdges[i]->getSelection() != 1) {
+  //             FlGui::instance()->selectedEdges[i]->setSelection(1);
+  //             entities.push_back(FlGui::instance()->selectedEdges[i]->tag());
+  //           }
+  //         }
+  //       }
+  //       else if(selectEntities && what == "Surface") {
+  //         for(std::size_t i = 0; i < FlGui::instance()->selectedFaces.size();
+  //             i++) {
+  //           if(FlGui::instance()->selectedFaces[i]->getSelection() != 1) {
+  //             FlGui::instance()->selectedFaces[i]->setSelection(1);
+  //             entities.push_back(FlGui::instance()->selectedFaces[i]->tag());
+  //           }
+  //         }
+  //       }
+  //       else if(!selectEntities &&
+  //               (FlGui::instance()->selectedFaces.size() ||
+  //                FlGui::instance()->selectedRegions.size())) {
+  //         int dim = FlGui::instance()->selectedFaces.size() ? 2 : 3;
+  //         if(dim == 2)
+  //           FlGui::instance()->selectedFaces[0]->setSelection(1);
+  //         else
+  //           FlGui::instance()->selectedRegions[0]->setSelection(1);
+  //         drawContext::global()->draw();
+  //         int tag = (dim == 2) ? FlGui::instance()->selectedFaces[0]->tag() :
+  //                                FlGui::instance()->selectedRegions[0]->tag();
+  //         add_embedded(GModel::current()->getFileName(), what, entities, dim,
+  //                      tag);
+  //         GModel::current()->setSelection(0);
+  //         selectEntities = true;
+  //         entities.clear();
+  //       }
+  //     }
+  //     if(ib == 'r') {
+  //       Msg::Warning(
+  //         "Entity de-selection not supported yet during boolean operation");
+  //     }
+  //     if(ib == 'u') {
+  //       if(selectEntities && entities.size()) {
+  //         int dim = (what == "Surface") ? 2 : (what == "Curve") ? 1 : 0;
+  //         GEntity *ge = GModel::current()->getEntityByTag(dim, entities.back());
+  //         if(ge) ge->setSelection(0);
+  //         entities.pop_back();
+  //       }
+  //     }
+  //     if(ib == 'e') {
+  //       if(selectEntities) {
+  //         if(entities.empty())
+  //           Msg::Error("At least one entity must be selected");
+  //         else
+  //           selectEntities = false;
+  //       }
+  //     }
+  //     if(ib == 'q') {
+  //       GModel::current()->setSelection(0);
+  //       break;
+  //     }
+  //   }
 
-    FlGui::instance()->transformContext->hide();
-    drawContext::global()->draw();
-    Msg::StatusGl("");
-  }
+  //   FlGui::instance()->transformContext->hide();
+  //   drawContext::global()->draw();
+  //   Msg::StatusGl("");
+  // }
 
-  static void mesh_define_compound_entity_cb(Fl_Widget * w, void *data)
-  {
-    action_point_line_surface_volume(10, (const char *)data);
-  }
+  // static void mesh_define_compound_entity_cb(Fl_Widget * w, void *data)
+  // {
+  //   action_point_line_surface_volume(10, (const char *)data);
+  // }
 
   // The static menus (we cannot use the 'g', 'm' 's' and 'p' mnemonics since
   // they are already defined as global shortcuts)
@@ -2904,83 +2932,83 @@ static void file_open_grd(Fl_Widget * w, void *data)
   // Alternative items for the MacOS system menu bar (removed '&' shortcuts:
   // they would cause spurious menu items to appear on the menu window; removed
   // File->Quit)
-  static Fl_Menu_Item sysbar_table[] = {
-    {"File", 0, 0, 0, FL_SUBMENU},
-    {"New...", FL_META + 'n', (Fl_Callback *)file_new_cb, 0},
-    {"Open...", FL_META + 'o', (Fl_Callback *)file_open_merge_cb,
-     (void *)"open"},
-    {"Open Recent", 0, 0, 0, FL_SUBMENU},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
-    {0},
-    {"Merge...", FL_META + FL_SHIFT + 'o', (Fl_Callback *)file_open_merge_cb,
-     (void *)"merge"},
-    {"Watch Pattern...", 0, (Fl_Callback *)file_watch_cb, 0, FL_MENU_DIVIDER},
-    {"Clear", 0, (Fl_Callback *)file_clear_cb, 0},
-    {"Rename...", FL_META + 'r', (Fl_Callback *)file_rename_cb, 0},
-    {"Delete", 0, (Fl_Callback *)file_delete_cb, 0, FL_MENU_DIVIDER},
-    {"Remote", 0, 0, 0, FL_MENU_DIVIDER | FL_SUBMENU},
-    {"Start...", 0, (Fl_Callback *)file_remote_cb, (void *)"start"},
-    {"Merge...", 0, (Fl_Callback *)file_remote_cb, (void *)"merge"},
-    {"Clear", 0, (Fl_Callback *)file_remote_cb, (void *)"clear"},
-    {"Stop", 0, (Fl_Callback *)file_remote_cb, (void *)"stop"},
-    {0},
-    {"Save Mesh", FL_META + 's', (Fl_Callback *)mesh_save_cb, 0},
-    {"Save Model Options", FL_META + 'j', (Fl_Callback *)file_options_save_cb,
-     (void *)"file"},
-    {"Save Options As Default", FL_META + FL_SHIFT + 'j',
-     (Fl_Callback *)file_options_save_cb, (void *)"default", FL_MENU_DIVIDER},
-    {"Export...", FL_META + 'e', (Fl_Callback *)file_export_cb, 0},
-    {0},
-    {"Tools", 0, 0, 0, FL_SUBMENU},
-    {"Options", FL_META + FL_SHIFT + 'n', (Fl_Callback *)options_cb, 0},
-    {"Plugins", FL_META + FL_SHIFT + 'u', (Fl_Callback *)plugin_cb,
-     (void *)(-1)},
-    {"Visibility", FL_META + FL_SHIFT + 'v', (Fl_Callback *)visibility_cb, 0},
-    {"Clipping", FL_META + FL_SHIFT + 'c', (Fl_Callback *)clip_cb, 0},
-    {"Manipulator", FL_META + FL_SHIFT + 'm', (Fl_Callback *)manip_cb, 0,
-     FL_MENU_DIVIDER},
-#if defined(HAVE_3M)
-    {"3M", 0, (Fl_Callback *)window3M_cb, 0, FL_MENU_DIVIDER},
-#endif
-    {"Statistics", FL_META + 'i', (Fl_Callback *)statistics_cb, 0},
-    {"Message Console", FL_META + 'l', (Fl_Callback *)show_hide_message_cb, 0},
-    {0},
-    {"Window", 0, 0, 0, FL_SUBMENU},
-    {"New Window", 0, (Fl_Callback *)file_window_cb, (void *)"new",
-     FL_MENU_DIVIDER},
-    {"Split Horizontally", 0, (Fl_Callback *)file_window_cb, (void *)"split_h"},
-    {"Split Vertically", 0, (Fl_Callback *)file_window_cb, (void *)"split_v"},
-    {"Unsplit", 0, (Fl_Callback *)file_window_cb, (void *)"split_u",
-     FL_MENU_DIVIDER},
-    {"Minimize", FL_META + 'm', (Fl_Callback *)window_cb, (void *)"minimize"},
-    {"Zoom", 0, (Fl_Callback *)window_cb, (void *)"zoom"},
-    {"Enter Full Screen", FL_META + 'f', (Fl_Callback *)window_cb,
-     (void *)"fullscreen", FL_MENU_DIVIDER},
-    {"Attach/Detach Menu", FL_META + 'd', (Fl_Callback *)attach_detach_menu_cb,
-     0, FL_MENU_DIVIDER},
-    {"Bring All to Front", 0, (Fl_Callback *)window_cb, (void *)"front"},
-    {0},
-    {"Help", 0, 0, 0, FL_SUBMENU},
-    {"Online Documentation", 0, (Fl_Callback *)help_online_cb, 0,
-     FL_MENU_DIVIDER},
-    {"Keyboard and Mouse Usage", 0, (Fl_Callback *)help_basic_cb, 0,
-     FL_MENU_DIVIDER},
-    {"Current Options and Workspace", FL_META + FL_SHIFT + 'h',
-     (Fl_Callback *)status_options_cb, (void *)"?"},
-    {"Restore all Options to Default Settings", 0,
-     (Fl_Callback *)options_restore_defaults_cb, 0},
-    {0},
-    {0}
-  };
+  // static Fl_Menu_Item sysbar_table[] = {
+  //   {"File", 0, 0, 0, FL_SUBMENU},
+  //   {"New...", FL_META + 'n', (Fl_Callback *)file_new_cb, 0},
+  //   {"Open...", FL_META + 'o', (Fl_Callback *)file_open_merge_cb,
+  //    (void *)"open"},
+  //   {"Open Recent", 0, 0, 0, FL_SUBMENU},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {"", 0, (Fl_Callback *)file_open_recent_cb, 0},
+  //   {0},
+  //   {"Merge...", FL_META + FL_SHIFT + 'o', (Fl_Callback *)file_open_merge_cb,
+  //    (void *)"merge"},
+  //   {"Watch Pattern...", 0, (Fl_Callback *)file_watch_cb, 0, FL_MENU_DIVIDER},
+  //   {"Clear", 0, (Fl_Callback *)file_clear_cb, 0},
+  //   {"Rename...", FL_META + 'r', (Fl_Callback *)file_rename_cb, 0},
+  //   {"Delete", 0, (Fl_Callback *)file_delete_cb, 0, FL_MENU_DIVIDER},
+  //   {"Remote", 0, 0, 0, FL_MENU_DIVIDER | FL_SUBMENU},
+  //   {"Start...", 0, (Fl_Callback *)file_remote_cb, (void *)"start"},
+  //   {"Merge...", 0, (Fl_Callback *)file_remote_cb, (void *)"merge"},
+  //   {"Clear", 0, (Fl_Callback *)file_remote_cb, (void *)"clear"},
+  //   {"Stop", 0, (Fl_Callback *)file_remote_cb, (void *)"stop"},
+  //   {0},
+  //   {"Save Mesh", FL_META + 's', (Fl_Callback *)mesh_save_cb, 0},
+  //   {"Save Model Options", FL_META + 'j', (Fl_Callback *)file_options_save_cb,
+  //    (void *)"file"},
+  //   {"Save Options As Default", FL_META + FL_SHIFT + 'j',
+  //    (Fl_Callback *)file_options_save_cb, (void *)"default", FL_MENU_DIVIDER},
+  //   {"Export...", FL_META + 'e', (Fl_Callback *)file_export_cb, 0},
+  //   {0},
+  //   {"Tools", 0, 0, 0, FL_SUBMENU},
+  //   {"Options", FL_META + FL_SHIFT + 'n', (Fl_Callback *)options_cb, 0},
+  //   {"Plugins", FL_META + FL_SHIFT + 'u', (Fl_Callback *)plugin_cb,
+  //    (void *)(-1)},
+  //   {"Visibility", FL_META + FL_SHIFT + 'v', (Fl_Callback *)visibility_cb, 0},
+  //   {"Clipping", FL_META + FL_SHIFT + 'c', (Fl_Callback *)clip_cb, 0},
+  //   {"Manipulator", FL_META + FL_SHIFT + 'm', (Fl_Callback *)manip_cb, 0,
+  //    FL_MENU_DIVIDER},
+  //   #if defined(HAVE_3M)
+  //       {"3M", 0, (Fl_Callback *)window3M_cb, 0, FL_MENU_DIVIDER},
+  //   #endif
+  //   {"Statistics", FL_META + 'i', (Fl_Callback *)statistics_cb, 0},
+  //   {"Message Console", FL_META + 'l', (Fl_Callback *)show_hide_message_cb, 0},
+  //   {0},
+  //   {"Window", 0, 0, 0, FL_SUBMENU},
+  //   {"New Window", 0, (Fl_Callback *)file_window_cb, (void *)"new",
+  //    FL_MENU_DIVIDER},
+  //   {"Split Horizontally", 0, (Fl_Callback *)file_window_cb, (void *)"split_h"},
+  //   {"Split Vertically", 0, (Fl_Callback *)file_window_cb, (void *)"split_v"},
+  //   {"Unsplit", 0, (Fl_Callback *)file_window_cb, (void *)"split_u",
+  //    FL_MENU_DIVIDER},
+  //   {"Minimize", FL_META + 'm', (Fl_Callback *)window_cb, (void *)"minimize"},
+  //   {"Zoom", 0, (Fl_Callback *)window_cb, (void *)"zoom"},
+  //   {"Enter Full Screen", FL_META + 'f', (Fl_Callback *)window_cb,
+  //    (void *)"fullscreen", FL_MENU_DIVIDER},
+  //   {"Attach/Detach Menu", FL_META + 'd', (Fl_Callback *)attach_detach_menu_cb,
+  //    0, FL_MENU_DIVIDER},
+  //   {"Bring All to Front", 0, (Fl_Callback *)window_cb, (void *)"front"},
+  //   {0},
+  //   {"Help", 0, 0, 0, FL_SUBMENU},
+  //   {"Online Documentation", 0, (Fl_Callback *)help_online_cb, 0,
+  //    FL_MENU_DIVIDER},
+  //   {"Keyboard and Mouse Usage", 0, (Fl_Callback *)help_basic_cb, 0,
+  //    FL_MENU_DIVIDER},
+  //   {"Current Options and Workspace", FL_META + FL_SHIFT + 'h',
+  //    (Fl_Callback *)status_options_cb, (void *)"?"},
+  //   {"Restore all Options to Default Settings", 0,
+  //    (Fl_Callback *)options_restore_defaults_cb, 0},
+  //   {0},
+  //   {0}
+  // };
 
 #endif
 

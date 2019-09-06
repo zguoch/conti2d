@@ -677,29 +677,155 @@ static void UWC_p2p(Fl_Widget *w, void *data)
   string inputfile(FlGui::instance()->continuationContext->input[1]->value());
   double h1=atof(FlGui::instance()->continuationContext->input[0]->value());
   double h2=atof(FlGui::instance()->continuationContext->input[2]->value());
-  run_UWC_p2p(inputfile,h1,h2);
-  
+  if(h2<h1)
+  {
+    Msg::Error("For the case of upward continuation from plane to plane, the elevation of continuation plane can not be less than the elevation of observation plane.");
+    Msg::Warning("Please check the value of elevation of continuation plane, should be a value greater than %f",h1);
+  }else if(inputfile=="")
+  {
+    Msg::Error("You have not selected  the grid data file(Surfer 6 .grd file) of the observation field.");
+    Msg::Warning("Please click the [Field] button to choose the grd file of observation field data.");
+  }
+  else
+  {
+    run_UWC_p2p(inputfile,h1,h2);
+  }
 }
 static void UWC_p2s(Fl_Widget *w, void *data)
 {
   string inputfile(FlGui::instance()->continuationContext->input[4]->value());
   double h1=atof(FlGui::instance()->continuationContext->input[3]->value());
   string topofile(FlGui::instance()->continuationContext->input[5]->value());
-  run_UWC_p2s(inputfile,h1,topofile);
+  //check parameter values
+  if(inputfile=="")
+  {
+    Msg::Error("You have not selected  the grid data file(Surfer 6 .grd file) of the observation field.");
+    Msg::Warning("Please click the [Field] button to choose the grd file of observation field data.");
+    return ;
+  }else if(topofile=="")
+  {
+    Msg::Error("You have not selected  the grid data file(Surfer 6 .grd file) of topography data of the continuation surface.");
+    Msg::Warning("Please click the [Topography] button to choose the grd file of topography of the continuation surface.");
+    return;
+  }
+  cContinuation conti;
+  GrdHead grdhead_topo,grdhead_field;
+  double* topo= conti.ReadGrd(topofile, grdhead_topo);
+  double min_topo;
+  if(topo!=NULL)
+  {
+    min_topo=topo[0];
+    for(int i=0;i<grdhead_topo.rows*grdhead_topo.cols;i++)
+    {
+      if(min_topo>topo[i])min_topo=topo[i];
+    }
+  }else
+  {
+    Msg::Error("Open topography file failed: %s",topofile.c_str());
+    return ;
+  }
+  
+  double* field=conti.ReadGrd(inputfile,grdhead_field);
+  if(min_topo<h1)
+  {
+    Msg::Error("For the case of upward continuation from plane to surface, the minimum value of topography can not be less than the elevation of observation plane.");
+    Msg::Warning("Please check the topography data of the continuation surface, the minimum value should be a value greater than %f",h1);
+  }else if(grdhead_topo.cols!=grdhead_field.cols || grdhead_topo.rows!=grdhead_field.rows)
+  {
+    Msg::Error("The grid of observation field data doesn't match the grid of topography of continued surface");
+    Msg::Warning("Field data grid has %d rows and %d columns",grdhead_field.rows,grdhead_field.cols);
+    Msg::Warning("The topography grid has %d rows and %d columns",grdhead_topo.rows,grdhead_topo.cols);
+    return;
+  }
+  else
+  {
+    run_UWC_p2s(inputfile,h1,topofile);
+  }
+  if(topo!=NULL)delete[] topo;
+  if(field!=NULL)delete[] field;
 }
 static void DWC_p2p(Fl_Widget *w, void *data)
 {
   string inputfile(FlGui::instance()->continuationContext->input[7]->value());
   double h1=atof(FlGui::instance()->continuationContext->input[6]->value());
   double h2=atof(FlGui::instance()->continuationContext->input[8]->value());
-  run_DWC_p2p(inputfile,h1,h2);
+  double kmax=atof(FlGui::instance()->continuationContext->input[9]->value());
+  if(h1<h2)
+  {
+    Msg::Error("For the case of downward continuation from plane to plane, the elevation of observation plane can not be less than the elevation of continuation plane.");
+    Msg::Warning("Please check the value of elevation of continuation plane, should be a value less than %f",h1);
+  }else if(inputfile=="")
+  {
+    Msg::Error("You have not selected  the grid data file(Surfer 6 .grd file) of the observation field.");
+    Msg::Warning("Please click the [Field] button to choose the grd file of observation field data.");
+  }
+  else
+  {
+    run_DWC_p2p(inputfile,h1,h2,kmax);
+  }
+  
 }
 static void DWC_s2p(Fl_Widget *w, void *data)
 {
-  string inputfile(FlGui::instance()->continuationContext->input[9]->value());
-  string topofile(FlGui::instance()->continuationContext->input[10]->value());
-  double h2=atof(FlGui::instance()->continuationContext->input[11]->value());
-  run_DWC_s2p(inputfile,topofile,h2);
+  string inputfile(FlGui::instance()->continuationContext->input[10]->value());
+  string topofile(FlGui::instance()->continuationContext->input[11]->value());
+  double h2=atof(FlGui::instance()->continuationContext->input[12]->value());
+  double kmax=atof(FlGui::instance()->continuationContext->input[13]->value());
+  if(kmax<=0)
+  {
+    Msg::Warning("The maximum number of iteration must be a positive integer value, automatically set to 1");
+    FlGui::instance()->continuationContext->input[13]->value("1");
+    FlGui::instance()->continuationContext->input[13]->set_changed();
+  }
+  //check parameter values
+  if(inputfile=="")
+  {
+    Msg::Error("You have not selected  the grid data file(Surfer 6 .grd file) of the observation field.");
+    Msg::Warning("Please click the [Field] button to choose the grd file of observation field data.");
+    return;
+  }else if(topofile=="")
+  {
+    Msg::Error("You have not selected  the grid data file(Surfer 6 .grd file) of topography data of the observation surface.");
+    Msg::Warning("Please click the [Topography] button to choose the grd file of topography of the observation surface.");
+    return;
+  }
+  
+  cContinuation conti;
+  GrdHead grdhead_topo,grdhead_field;
+  double* topo= conti.ReadGrd(topofile, grdhead_topo);
+  double min_topo;
+  if(topo!=NULL)
+  {
+    min_topo=topo[0];
+    for(int i=0;i<grdhead_topo.rows*grdhead_topo.cols;i++)
+    {
+      if(min_topo>topo[i])min_topo=topo[i];
+    }
+  }else
+  {
+    Msg::Error("Open topography file failed: %s",topofile.c_str());
+    return ;
+  }
+  
+  double* field=conti.ReadGrd(inputfile,grdhead_field);
+  if(min_topo<h2)
+  {
+    Msg::Error("For the case of downward continuation from surface to plane, the minimum value of topography(observation surface) can not be less than the elevation of continuation plane.");
+    Msg::Warning("Please check the elevation of continuation plane, the elevation should be a value less than %f",min_topo);
+  }else if(grdhead_topo.cols!=grdhead_field.cols || grdhead_topo.rows!=grdhead_field.rows)
+  {
+    Msg::Error("The grid of observation field data doesn't match the grid of topography of observation surface");
+    Msg::Warning("Field data grid has %d rows and %d columns",grdhead_field.rows,grdhead_field.cols);
+    Msg::Warning("The topography grid has %d rows and %d columns",grdhead_topo.rows,grdhead_topo.cols);
+    return;
+  }
+  else
+  {
+    run_DWC_s2p(inputfile,topofile,h2,kmax);
+  }
+  if(topo!=NULL)delete[] topo;
+  if(field!=NULL)delete[] field;
+  
 }
 continuationContextWindow::continuationContextWindow(int deltaFontSize)
 {
@@ -793,8 +919,12 @@ continuationContextWindow::continuationContextWindow(int deltaFontSize)
       input[8] = new Fl_Float_Input(2 * WB, 2 * WB + 3 * BH, IW, BH, "Elevation of The Continuation Field");
       input[8]->value("0");
       input[8]->tooltip("Elevation of the continuation field");
+      //4. Landweber iteration 
+      input[9] = new Fl_Float_Input(2 * WB, 2 * WB + 4 * BH, IW, BH, "Maximum Number of Iteration");
+      input[9]->value("100");
+      input[9]->tooltip("Landweber iteration parameter: Maximum Number of Iteration");
 
-      for(int i = 6; i < 9; i++) {
+      for(int i = 6; i < 10; i++) {
         input[i]->align(FL_ALIGN_RIGHT);
       }
       {
@@ -810,22 +940,26 @@ continuationContextWindow::continuationContextWindow(int deltaFontSize)
                               height - 3 * WB - 2 * BH, "DWC_S2P");
       group[3]->tooltip("Downward continuation from surface to plane");
       //1. file chose
-      input[9] = new Fl_Input(2 * WB, 2 * WB + 1 * BH, IW, BH, "");
-      input[9]->tooltip("Click the right button to choose the observation field data");
+      input[10] = new Fl_Input(2 * WB, 2 * WB + 1 * BH, IW, BH, "");
+      input[10]->tooltip("Click the right button to choose the observation field data");
       Fl_Button *b1 = new Fl_Button(IW+2 * WB, 2 * WB + 1 * BH, BB, BH, "Field");
       b1->tooltip("Click to read observation field grid data");
-      b1->callback(field_select_grd_cb, input[9]);
+      b1->callback(field_select_grd_cb, input[10]);
       //2. elevation 2
-      input[10] = new Fl_Input(2 * WB, 2 * WB + 2 * BH, IW, BH, "");
-      input[10]->tooltip("Click the right button to choose the topography");
+      input[11] = new Fl_Input(2 * WB, 2 * WB + 2 * BH, IW, BH, "");
+      input[11]->tooltip("Click the right button to choose the topography");
       Fl_Button *b2 = new Fl_Button(IW+2 * WB, 2 * WB + 2 * BH, BB, BH, "Topography");
       b2->tooltip("Click to read topography of observation surface");
-      b2->callback(field_select_grd_cb, input[10]);
+      b2->callback(field_select_grd_cb, input[11]);
       //3. elevation 1
-      input[11] = new Fl_Float_Input(2 * WB, 2 * WB + 3 * BH, IW, BH, "Elevation of The Continuation Field");
-      input[11]->value("0");
-      input[11]->tooltip("Elevation of the Continuation Field");
-      for(int i = 9; i < 12; i++) {
+      input[12] = new Fl_Float_Input(2 * WB, 2 * WB + 3 * BH, IW, BH, "Elevation of The Continuation Field");
+      input[12]->value("0");
+      input[12]->tooltip("Elevation of the Continuation Field");
+      //4. Landweber iteration 
+      input[13] = new Fl_Float_Input(2 * WB, 2 * WB + 4 * BH, IW, BH, "Maximum Number of Iteration");
+      input[13]->value("100");
+      input[13]->tooltip("Landweber iteration parameter: Maximum Number of Iteration");
+      for(int i = 10; i < 14; i++) {
         input[i]->align(FL_ALIGN_RIGHT);
       }
       {
