@@ -864,7 +864,7 @@ static void file_open_grd(Fl_Widget * w, void *data)
 
   static void help_online_cb(Fl_Widget * w, void *data)
   {
-    fl_open_uri("https://github.com/CosmicScholar/conti2d");
+    fl_open_uri("https://github.com/CosmicScholar/conti2d/blob/master/manual/manual_conti2d.pdf");
   }
 
   // static void help_basic_cb(Fl_Widget * w, void *data)
