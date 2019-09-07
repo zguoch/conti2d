@@ -2910,7 +2910,7 @@ static void file_open_grd(Fl_Widget * w, void *data)
 //     {"Bring All to Front", 0, (Fl_Callback *)window_cb, (void *)"front"},
 //     {0},
     {"&Help", 0, 0, 0, FL_SUBMENU},
-    {"On&line Documentation", 0, (Fl_Callback *)help_online_cb, 0,
+    {"On&line Manual", 0, (Fl_Callback *)help_online_cb, 0,
      FL_MENU_DIVIDER},
     // {"&Keyboard and Mouse Usage", FL_CTRL + 'h', (Fl_Callback *)help_basic_cb,
     //  0, FL_MENU_DIVIDER},
