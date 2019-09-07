@@ -457,9 +457,9 @@ FlGui::FlGui(int argc, char **argv)
 
 #if defined(__APPLE__)
   // the defaults use %@, which leads to (lowercase) gmsh
-  Fl_Mac_App_Menu::about = "About Gmsh";
-  Fl_Mac_App_Menu::hide = "Hide Gmsh";
-  Fl_Mac_App_Menu::quit = "Quit Gmsh";
+  Fl_Mac_App_Menu::about = "About Conti2d";
+  Fl_Mac_App_Menu::hide = "Hide Conti2d";
+  Fl_Mac_App_Menu::quit = "Quit Conti2d";
   Fl_Mac_App_Menu::print = ""; // this sometimes crashes
 #endif
 

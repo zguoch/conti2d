@@ -314,7 +314,7 @@ helpWindow::helpWindow()
 
     about = new paletteWindow(width, height,
                               CTX::instance()->nonModalWindows ? true : false,
-                              "About Gmsh");
+                              "About Conti2d");
     about->box(GMSH_WINDOW_BOX);
 
     Fl_Help_View *o = new Fl_Help_View(0, 0, width, height);
@@ -324,19 +324,19 @@ helpWindow::helpWindow()
     std::ostringstream sstream;
     sstream
       << "<center><h3>Gmsh</h3><br>version " << GetGmshVersion()
-      << "<p>Copyright (C) 1997-2019"
-      << "<br>Christophe Geuzaine and Jean-Francois Remacle"
-      << "<p><a href=\"http://gmsh.info/doc/CREDITS.txt\">Credits</a> "
-      << "and <a href=\"http://gmsh.info/doc/LICENSE.txt\">licensing "
-      << "information</a>"
-      << "<p>Please report all issues on "
-      << "<a href=\"https://gitlab.onelab.info/gmsh/gmsh/issues\">"
-      << "https://gitlab.onelab.info/gmsh/gmsh/issues</a></center>"
+      << "<p>Copyright (C) 2019"
+      << "<br>Zhikui Guo"
+      // << "<p><a href=\"http://gmsh.info/doc/CREDITS.txt\">Credits</a> "
+      // << "and <a href=\"http://gmsh.info/doc/LICENSE.txt\">licensing "
+      // << "information</a>"
+      // << "<p>Please report all issues on "
+      << "<a href=\"https://github.com/CosmicScholar/conti2d/issues\">"
+      << "https://github.com/CosmicScholar/conti2d/issues</a></center>"
       << "<ul>"
       << "<li><i>Build OS:</i> " << GetGmshBuildOS()
       << "<li><i>Build date:</i> " << GetGmshBuildDate()
       << "<li><i>Build host:</i> " << GetGmshBuildHost()
-      << "<li><i>Build options:</i>" << GetGmshBuildOptions()
+      // << "<li><i>Build options:</i>" << GetGmshBuildOptions()
       << "<li><i>FLTK version:</i> " << FL_MAJOR_VERSION << "."
       << FL_MINOR_VERSION << "." << FL_PATCH_VERSION
 #if defined(HAVE_PETSC)
@@ -357,7 +357,7 @@ helpWindow::helpWindow()
       << "." << MED_NUM_RELEASE
 #endif
       << "<li><i>Packaged by:</i> " << GetGmshPackager() << "</ul>"
-      << "<center>Visit <a href=\"http://gmsh.info\">http://gmsh.info</a> "
+      << "<center>Visit <a href=\"https://github.com/CosmicScholar/conti2d\">https://github.com/CosmicScholar/conti2d</a> "
       << "for more information</center>";
     o->value(sstream.str().c_str());
     o->link(help_link);
