@@ -481,7 +481,7 @@ int UWC_p2p_f(double* inputdata,double* result,GrdHead grdhead,double rph)
 	int N = number_x*number_y;
 	double* originaldata = inputdata;
 	fftw_complex* out_c = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)* N);
-	FFT2d(number_y, number_x, originaldata, out_c);			//傅里叶变换
+	FFT2d(number_y, number_x, originaldata, out_c);
 	double *bounds = grdhead.bounds;
 	double dy = fabs(bounds[3] - bounds[2]) / (number_y - 1), dx = fabs(bounds[1] - bounds[0]) / (number_x - 1);
 	double en = dy*(number_y), em = dx*(number_x);
