@@ -1,0 +1,8 @@
+*.vtk
+*.grd
+
+*.xyz
+*.dat
+*.nc
+
+mag_topo_dwc_s2p_Landweber/

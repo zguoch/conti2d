@@ -1,0 +1,6 @@
+*.vtk
+*.grd
+
+*.xyz
+*.dat
+*.nc
