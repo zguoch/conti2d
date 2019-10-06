@@ -1,9 +1,0 @@
-<map id="UWC_p2p_f" name="UWC_p2p_f">
-<area shape="rect" id="node2" href="$stdfunc_8cpp_aaea96ecea3031c19d3ef88f6f1590d4a.html#aaea96ecea3031c19d3ef88f6f1590d4a" title="Get file extension name from a full file path. " alt="" coords="148,5,281,31"/>
-<area shape="rect" id="node3" href="$stdfunc_8cpp_a88f10a86b8808047787d2df5e8cbcb72.html#a88f10a86b8808047787d2df5e8cbcb72" title="Get file name from a full path. " alt="" coords="147,55,282,80"/>
-<area shape="rect" id="node4" href="$stdfunc_8cpp_a2c90cdea3ca11177ba34c14a3b0a00cb.html#a2c90cdea3ca11177ba34c14a3b0a00cb" title="Read a ASCII Surfer format grid (6) " alt="" coords="177,104,252,129"/>
-<area shape="rect" id="node5" href="$stdfunc_8cpp_ab76adf263893ac28772283c5a00b964c.html#ab76adf263893ac28772283c5a00b964c" title="Save a grid data as ASCII surfer grid file. " alt="" coords="178,153,252,179"/>
-<area shape="rect" id="node6" href="$stdfunc_8cpp_a95502a9bee4005071ea4fd3cb5e1c228.html#a95502a9bee4005071ea4fd3cb5e1c228" title="Save Grd data as netCDF format. " alt="" coords="151,203,278,228"/>
-<area shape="rect" id="node7" href="$stdfunc_8cpp_a6334abab105b1fe7efa9a3e2a4b07c47.html#a6334abab105b1fe7efa9a3e2a4b07c47" title="Save results of at each iteration step as vtk file. " alt="" coords="161,252,268,277"/>
-<area shape="rect" id="node8" href="$stdfunc_8cpp_a0858a57d19c1ac2f09fe65f7f416e2a1.html#a0858a57d19c1ac2f09fe65f7f416e2a1" title="SaveGrd2xyz" alt="" coords="164,301,265,327"/>
-</map>

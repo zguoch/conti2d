@@ -1,8 +1,0 @@
-<map id="MultiProgressBar.h" name="MultiProgressBar.h">
-<area shape="rect" id="node2" href="$stdfunc_8h.html" title="Definition of some basic functions. " alt="" coords="219,79,294,104"/>
-<area shape="rect" id="node6" href="$MultiProgressBar_8cpp.html" title="Implementation of progress bar. " alt="" coords="252,225,400,251"/>
-<area shape="rect" id="node3" href="$Conti2D_8h.html" title="Definition of sub&#45;functions of continuation of potential field data. " alt="" coords="107,152,188,177"/>
-<area shape="rect" id="node7" href="$stdfunc_8cpp.html" title="Implementation of some basic functions. For example read and write file. " alt="" coords="212,152,301,177"/>
-<area shape="rect" id="node4" href="$Conti2D_8cpp.html" title="Implementation of the sub&#45;functions of continuation of potential field in spatial domain..." alt="" coords="5,225,100,251"/>
-<area shape="rect" id="node5" href="$main_8cpp.html" title="The C++ main function of the continuation program conti2d. " alt="" coords="124,225,200,251"/>
-</map>

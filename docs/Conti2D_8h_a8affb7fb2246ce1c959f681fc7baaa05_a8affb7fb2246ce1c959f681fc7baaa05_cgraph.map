@@ -1,8 +1,0 @@
-<map id="DWC_p2p_LandweberIter" name="DWC_p2p_LandweberIter">
-<area shape="rect" id="node2" href="$stdfunc_8cpp_a98827c14ed7072c96834f20205c7a916.html#a98827c14ed7072c96834f20205c7a916" title="Norm2" alt="" coords="285,5,346,31"/>
-<area shape="rect" id="node3" href="$stdfunc_8cpp_a43fc3af75243a047d61aadea31c0fa9c.html#a43fc3af75243a047d61aadea31c0fa9c" title="Get 2nd norm of the gradient of a grid data. " alt="" coords="256,55,376,80"/>
-<area shape="rect" id="node4" href="$stdfunc_8cpp_a88f10a86b8808047787d2df5e8cbcb72.html#a88f10a86b8808047787d2df5e8cbcb72" title="Get file name from a full path. " alt="" coords="248,104,383,129"/>
-<area shape="rect" id="node5" href="$stdfunc_8cpp_a6334abab105b1fe7efa9a3e2a4b07c47.html#a6334abab105b1fe7efa9a3e2a4b07c47" title="Save results of at each iteration step as vtk file. " alt="" coords="262,153,369,179"/>
-<area shape="rect" id="node6" href="$classMultiProgressBar_a58eef55ad6d5c7d769b3a402a2ef7b85.html#a58eef55ad6d5c7d769b3a402a2ef7b85" title="MultiProgressBar::Update" alt="" coords="229,203,403,228"/>
-<area shape="rect" id="node7" href="$Conti2D_8cpp_a632c1e4efbb7e9b1aaf04db729e69394.html#a632c1e4efbb7e9b1aaf04db729e69394" title="Calculate upward continuation as , see equation (5). " alt="" coords="277,252,354,277"/>
-</map>

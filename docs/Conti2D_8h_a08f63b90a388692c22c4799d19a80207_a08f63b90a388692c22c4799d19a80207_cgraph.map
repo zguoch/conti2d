@@ -1,8 +1,0 @@
-<map id="DWC_s2p_Tikhonov" name="DWC_s2p_Tikhonov">
-<area shape="rect" id="node2" href="$Conti2D_8cpp_a98827c14ed7072c96834f20205c7a916.html#a98827c14ed7072c96834f20205c7a916" title="Norm2" alt="" coords="253,5,314,31"/>
-<area shape="rect" id="node3" href="$Conti2D_8cpp_a6334abab105b1fe7efa9a3e2a4b07c47.html#a6334abab105b1fe7efa9a3e2a4b07c47" title="Save results of at each iteration step as vtk file. " alt="" coords="230,55,337,80"/>
-<area shape="rect" id="node4" href="$classMultiProgressBar_a58eef55ad6d5c7d769b3a402a2ef7b85.html#a58eef55ad6d5c7d769b3a402a2ef7b85" title="MultiProgressBar::Update" alt="" coords="196,104,370,129"/>
-<area shape="rect" id="node5" href="$Conti2D_8cpp_a6e44071dbbec5b92ddf8673dea8c41de.html#a6e44071dbbec5b92ddf8673dea8c41de" title="UWC_G_CGLS_Tik" alt="" coords="214,153,353,179"/>
-<area shape="rect" id="node7" href="$Conti2D_8cpp_a9d30373a0ff29e4f743eaf5e4cbc3cbf.html#a9d30373a0ff29e4f743eaf5e4cbc3cbf" title="UWC_Gji" alt="" coords="418,203,495,228"/>
-<area shape="rect" id="node6" href="$Conti2D_8cpp_a632c1e4efbb7e9b1aaf04db729e69394.html#a632c1e4efbb7e9b1aaf04db729e69394" title="UWC_Gij" alt="" coords="418,153,495,179"/>
-</map>
