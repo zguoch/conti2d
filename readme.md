@@ -6,6 +6,8 @@
 
 # Manual
 
+[Tutorial video of GUI version](https://youtu.be/jQcnD3rnlkg)
+
 ## Hellow World
 
 ![](figures/snapshot/hello.png)
