@@ -864,7 +864,7 @@ static void file_open_grd(Fl_Widget * w, void *data)
 
   static void help_online_cb(Fl_Widget * w, void *data)
   {
-    fl_open_uri("https://github.com/CosmicScholar/conti2d/blob/master/manual/manual_conti2d.pdf");
+    fl_open_uri("https://github.com/zguoch/conti2d/blob/master/manual/manual_conti2d.pdf");
   }
 
   // static void help_basic_cb(Fl_Widget * w, void *data)
@@ -2867,7 +2867,7 @@ static void file_open_grd(Fl_Widget * w, void *data)
     // {"Clear", 0, (Fl_Callback *)file_remote_cb, (void *)"clear"},
     // {"Stop", 0, (Fl_Callback *)file_remote_cb, (void *)"stop"},
     // {0},
-    {"Sa&ve Mesh", FL_CTRL + FL_SHIFT + 's', (Fl_Callback *)mesh_save_cb, 0},
+    {"Sa&ve Result", FL_CTRL + FL_SHIFT + 's', (Fl_Callback *)mesh_save_cb, 0},
     // {"Save Model Options", FL_CTRL + 'j', (Fl_Callback *)file_options_save_cb,
     //  (void *)"file"},
     {"Save Options As Default", FL_CTRL + FL_SHIFT + 'j',
