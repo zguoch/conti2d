@@ -4,6 +4,27 @@
 
 ![Download](https://img.shields.io/badge/Documents-orange.svg) [![download](https://img.shields.io/badge/Doxygen-doc-green.svg)](https://cosmicscholar.github.io/conti2d/)
 
+[![download](https://img.shields.io/badge/doi-10.1016/j.cageo.2020.104405-green.svg)](https://www.doi.org/10.1016/j.cageo.2020.104405)
+
+## Citation
+The bibtex entry of [10.1016/j.cageo.2020.104405](https://www.doi.org/10.1016/j.cageo.2020.104405) is listed below.
+
+```bash
+@article{Guo2020,
+author = {Guo, Zhikui and Tao, Chunhui},
+doi = {10.1016/j.cageo.2020.104405},
+issn = {00983004},
+journal = {Computers and Geosciences},
+keywords = {Downward continuation,Fredholm integration,New kernel function,Potential field,Spatial domain,Surface to surface},
+month = {mar},
+publisher = {Elsevier Ltd},
+title = {{Potential field continuation in spatial domain: A new kernel function and its numerical scheme}},
+volume = {136},
+year = {2020}
+}
+
+```
+
 # Manual
 
 [Tutorial video of GUI version](https://youtu.be/jQcnD3rnlkg)
