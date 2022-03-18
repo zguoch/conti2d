@@ -1,0 +1,47 @@
+cmake_minimum_required(VERSION 3.3...3.12 FATAL_ERROR)
+
+project(conti2d LANGUAGES CXX C)
+if(${CMAKE_VERSION} VERSION_LESS "3.3") 
+else()
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
+# Using OpenMP
+include_directories(/usr/local/Cellar/libomp/12.0.1/include /usr/local/Cellar/libomp/11.0.0/include /usr/local/Cellar/libomp/11.1.0/include)
+find_package(OpenMP REQUIRED)
+if(APPLE)
+    set(CMAKE_C_COMPILER clang)
+    set(CMAKE_CXX_COMPILER clang++)
+
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang\$")
+        set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp")
+        set(OpenMP_C_LIB_NAMES "omp")
+        set(OpenMP_omp_LIBRARY omp)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
+        set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
+        set(OpenMP_CXX_LIB_NAMES "omp")
+        set(OpenMP_omp_LIBRARY omp)
+    endif()
+endif()
+if(OPENMP_FOUND)
+    message("OPENMP FOUND")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
+#windows vs2017 doesn't need opm library link 
+set(LIBomp "")
+if (APPLE)
+  set(LIBomp "omp")
+endif()
+
+include_directories("/opt/local/include" "/usr/local/include" "fftw-3.3.7/build/include" "netcdf/include")
+link_directories("/usr/local/lib" "/opt/local/lib" "fftw-3.3.7/build/lib" "netcdf/lib")
+set(src )
+add_executable(${PROJECT_NAME} src/main.cpp src/MultiProgressBar.cpp src/Conti2D.cpp src/stdfunc.cpp src/FFTN.cpp)
+target_link_libraries(${PROJECT_NAME} fftw3 netcdf ${LIBomp})
+
+message(STATUS "OpenMP: " ${LIBomp})
