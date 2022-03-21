@@ -887,7 +887,7 @@ void DWC_p2p_LandweberIter(double* G,double* x, double* b,GrdHead grdhead,int ex
             fout_log<<endl;
         }
         //5. write temporary result
-        // if (!SaveGrd(path_tempResult+"/"+std::to_string(k)+".grd", grdhead, x,extNum,false,false))return ;
+        if (!SaveGrd(path_tempResult+"/"+std::to_string(k)+".grd", grdhead, x,extNum,false,false))return ;
         SaveGrd2VTK(path_tempResult+"/result_"+std::to_string(k)+".vtk",grdhead,x);
         //update progressbar
         bar_pos[0]=k+1;
@@ -983,8 +983,8 @@ void DWC_s2p_LandweberIter(double** G,double* x, double* b,
         }
         
         //5. write temporary result
-        // if (!SaveGrd(path_tempResult+"/"+std::to_string(k)+".grd", grdhead, x,extNum,false,false))return ;
-        SaveGrd2VTK(path_tempResult+"/result_"+std::to_string(k)+".vtk",grdhead,x);
+        if (!SaveGrd(path_tempResult+"/"+std::to_string(k)+".grd", grdhead, x,extNum,false,false))return ;
+        SaveGrd2VTK(path_tempResult+"/result_"+std::to_string(k)+".vtk",grdhead,x,0,residual);
         if(RE<REmin)break;
         //update progressbar
         bar_pos[0]=k+1;

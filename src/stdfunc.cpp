@@ -267,7 +267,8 @@ bool SaveGrd2netCDF(string filename, GrdHead grdhead,double* data,int extNum,boo
       ERR(retval);
 
     // delete pointer
-    delete[] x,y;
+    delete[] x;
+    delete[] y;
     for(int i=0;i<NX;i++)delete[] data_out[i];
     delete[] data_out;
     return true;
@@ -303,7 +304,7 @@ bool SaveGrd2netCDF(string filename, GrdHead grdhead,double* data,int extNum,boo
     return sqrt(sum);
  }
 
- int SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z)
+ int SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z,double* err)
 {
     //vtk format
     ofstream fout(outputfile);
@@ -340,6 +341,16 @@ bool SaveGrd2netCDF(string filename, GrdHead grdhead,double* data,int extNum,boo
     {
         fout<<data[i]<<" ";
     }fout<<endl;
+    // write residual if exist
+    if(err)
+    {
+        fout<<"SCALARS Residual_UWC float"<<endl;
+        fout<<"LOOKUP_TABLE default"<<endl;
+        for(int i=0;i<num_pt;i++)
+        {
+            fout<<err[i]<<" ";
+        }fout<<endl;
+    }
     fout.close();
     // cout<<"Output VTK file of result finished"<<endl;
     return 0;

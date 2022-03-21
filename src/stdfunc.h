@@ -171,7 +171,7 @@ double Norm2_Gradient(double* result,GrdHead grdhead);
  * @param data 
  * @return int 
  */
-int SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z=0);
+int SaveGrd2VTK(string outputfile,GrdHead grdhead,double* data,double z=0, double* err=NULL);
 
 /**
  * @brief Save a grid field data on a topography as vtk format (3d)
