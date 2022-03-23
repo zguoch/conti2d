@@ -966,6 +966,10 @@ void DWC_s2p_LandweberIter(double** G,double* x, double* b,
         for(int i=0;i<modelnum;i++)x[i]=x[i]+residual[i];//xn=xn1+residual
         UWC_Gij(x_uwc,G,x,modelnum,num_thread);//x_uwc=A*xn
         for(int i=0;i<modelnum;i++)residual[i]=b[i]-x_uwc[i];//residual=b-A*xn
+        //5. write temporary result
+        if (!SaveGrd(path_tempResult+"/"+std::to_string(k)+".grd", grdhead, x,extNum,false,false))return ;
+        SaveGrd2VTK(path_tempResult+"/result_"+std::to_string(k)+".vtk",grdhead,x,0,residual);
+        
         UWC_Gij(x_uwc,G,residual,modelnum,num_thread);//x_uwc=A*residual
         for(int i=0;i<modelnum;i++)residual[i]=x_uwc[i];
         
@@ -982,9 +986,6 @@ void DWC_s2p_LandweberIter(double** G,double* x, double* b,
             fout_log<<endl;
         }
         
-        //5. write temporary result
-        if (!SaveGrd(path_tempResult+"/"+std::to_string(k)+".grd", grdhead, x,extNum,false,false))return ;
-        SaveGrd2VTK(path_tempResult+"/result_"+std::to_string(k)+".vtk",grdhead,x,0,residual);
         if(RE<REmin)break;
         //update progressbar
         bar_pos[0]=k+1;
